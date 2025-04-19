@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_setting"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:paddingStart="16dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="24dp"
+            android:text="@string/settings"
+            android:textColor="@color/black"
+            android:textSize="22sp" />
+
+        <LinearLayout style="@style/SettingScreenLinearLayout">
+
+            <TextView
+                style="@style/SettingScreenTextView"
+                android:text="@string/dark_theme" />
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="11dp"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/SettingScreenLinearLayout">
+
+            <TextView
+                style="@style/SettingScreenTextView"
+                android:text="@string/share_app" />
+
+            <ImageView
+                style="@style/SettingScreenImageView"
+                android:contentDescription="@string/share_app"
+                android:src="@drawable/ic_share" />
+        </LinearLayout>
+
+
+        <LinearLayout style="@style/SettingScreenLinearLayout">
+
+            <TextView
+                style="@style/SettingScreenTextView"
+                android:text="@string/write_to_support" />
+
+            <ImageView
+                style="@style/SettingScreenImageView"
+                android:contentDescription="@string/write_to_support"
+                android:src="@drawable/ic_support" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/SettingScreenLinearLayout">
+
+            <TextView
+                style="@style/SettingScreenTextView"
+                android:text="@string/user_agreement" />
+
+            <ImageView
+                style="@style/SettingScreenImageView"
+                android:contentDescription="@string/user_agreement"
+                android:src="@drawable/ic_arrow" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout style="@style/BottomNavigationScreenLinearLayout">
+
+            <ImageView
+                style="@style/BottomNavigationScreenImageView"
+                android:contentDescription="@string/search"
+                android:src="@drawable/ic_search" />
+
+            <TextView
+                style="@style/BottomNavigationScreenTextView"
+                android:text="@string/search"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/BottomNavigationScreenLinearLayout">
+
+            <ImageView
+                style="@style/BottomNavigationScreenImageView"
+                android:contentDescription="@string/search"
+                android:src="@drawable/ic_media" />
+
+            <TextView
+                style="@style/BottomNavigationScreenTextView"
+                android:text="@string/media"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/BottomNavigationScreenLinearLayout">
+
+            <ImageView
+                style="@style/BottomNavigationScreenImageView"
+                android:contentDescription="@string/search"
+                android:src="@drawable/ic_setting" />
+
+            <TextView
+                style="@style/BottomNavigationScreenTextView"
+                android:text="@string/settings"
+                android:textColor="@color/black" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
