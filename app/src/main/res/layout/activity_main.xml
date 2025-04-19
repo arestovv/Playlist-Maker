@@ -23,6 +23,7 @@
         style="@style/MainScreenButton"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="8dp"
+        android:id="@+id/button_search"
         android:text="@string/search"
         app:icon="@drawable/ic_search" />
 
@@ -30,6 +31,7 @@
         style="@style/MainScreenButton"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        android:id="@+id/button_media"
         android:text="@string/media"
         app:icon="@drawable/ic_media" />
 
@@ -37,6 +39,7 @@
         style="@style/MainScreenButton"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="28dp"
+        android:id="@+id/button_setting"
         android:text="@string/settings"
         app:icon="@drawable/ic_setting" />
 
