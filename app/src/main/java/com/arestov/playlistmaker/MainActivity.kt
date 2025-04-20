@@ -20,9 +20,11 @@ class MainActivity : AppCompatActivity() {
         }
         buttonMedia.setOnClickListener {
             val displayIntent = Intent(this, MediaActivity::class.java)
-            startActivity(displayIntent)        }
+            startActivity(displayIntent)
+        }
         buttonSettings.setOnClickListener {
             val displayIntent = Intent(this, SettingsActivity::class.java)
-            startActivity(displayIntent)        }
+            startActivity(displayIntent)
+        }
     }
 }
