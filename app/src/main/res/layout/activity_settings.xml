@@ -19,14 +19,9 @@
     <com.google.android.material.switchmaterial.SwitchMaterial
         style="@style/SettingScreenTextView"
         android:text="@string/dark_theme"
-        android:thumb="@drawable/ic_knob"
-        app:track="@drawable/ic_track"
+        android:thumb="@drawable/switch_thumb_selector"
+        app:track="@drawable/switch_track_selector"
         app:useMaterialThemeColors="false" />
-
-<!--  android:paddingEnd="18dp"
-        Пытался выровнить по макету каждую иконку,
-        но как то стало еще хуже, оставил общий paddingEnd
-        -->
 
     <com.google.android.material.textview.MaterialTextView
         style="@style/SettingScreenTextView"
