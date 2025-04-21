@@ -1,96 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_setting"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/top_panel_settings_screen"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="@string/settings"
+        app:titleTextAppearance="@style/TitleTextStyle" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        style="@style/SettingScreenTextView"
+        android:text="@string/dark_theme"
+        android:thumb="@drawable/ic_knob"
+        app:track="@drawable/ic_track"
+        app:useMaterialThemeColors="false" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_arrow_back"
-                android:id="@+id/button_arrow_back"
-                android:layout_margin="16dp"/>
+<!--  android:paddingEnd="18dp"
+        Пытался выровнить по макету каждую иконку,
+        но как то стало еще хуже, оставил общий paddingEnd
+        -->
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:paddingStart="16dp"
-                android:paddingTop="14dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="24dp"
-                android:text="@string/settings"
-                android:textColor="@color/black"
-                android:textSize="22sp" />
-        </LinearLayout>
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/SettingScreenTextView"
+        android:drawableEnd="@drawable/ic_share"
+        android:text="@string/share_app" />
 
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/SettingScreenTextView"
+        android:drawableEnd="@drawable/ic_support"
+        android:text="@string/write_to_support" />
 
-        <LinearLayout style="@style/SettingScreenLinearLayout">
-
-            <TextView
-                style="@style/SettingScreenTextView"
-                android:text="@string/dark_theme" />
-
-            <Switch
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:paddingBottom="11dp"
-                tools:ignore="UseSwitchCompatOrMaterialXml" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/SettingScreenLinearLayout">
-
-            <TextView
-                style="@style/SettingScreenTextView"
-                android:text="@string/share_app" />
-
-            <ImageView
-                style="@style/SettingScreenImageView"
-                android:contentDescription="@string/share_app"
-                android:src="@drawable/ic_share" />
-        </LinearLayout>
-
-
-        <LinearLayout style="@style/SettingScreenLinearLayout">
-
-            <TextView
-                style="@style/SettingScreenTextView"
-                android:text="@string/write_to_support" />
-
-            <ImageView
-                style="@style/SettingScreenImageView"
-                android:contentDescription="@string/write_to_support"
-                android:src="@drawable/ic_support" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/SettingScreenLinearLayout">
-
-            <TextView
-                style="@style/SettingScreenTextView"
-                android:text="@string/user_agreement" />
-
-            <ImageView
-                style="@style/SettingScreenImageView"
-                android:contentDescription="@string/user_agreement"
-                android:src="@drawable/ic_arrow" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/SettingScreenTextView"
+        android:drawableEnd="@drawable/ic_arrow"
+        android:text="@string/user_agreement" />
 </LinearLayout>

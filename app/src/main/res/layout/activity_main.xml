@@ -8,16 +8,12 @@
     android:orientation="vertical">
 
 
-    <TextView
+    <com.google.android.material.appbar.MaterialToolbar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingTop="14dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="16dp"
-        android:text="@string/app_name"
-        android:textColor="@color/white"
-        android:textSize="22sp" />
+        app:title="@string/app_name"
+        app:titleTextColor="@color/white"
+        app:titleTextAppearance="@style/TitleTextStyle"/>
 
     <Button
         style="@style/MainScreenButton"
@@ -42,6 +38,5 @@
         android:id="@+id/button_setting"
         android:text="@string/settings"
         app:icon="@drawable/ic_setting" />
-
 </LinearLayout>
 
