@@ -43,7 +43,7 @@ class SettingsActivity : AppCompatActivity() {
         //Agreement
         val buttonAgreement = findViewById<MaterialTextView>(R.id.button_agreement)
         buttonAgreement.setOnClickListener {
-            val url = "https://yandex.ru/legal/practicum_offer/"
+            val url = getString(R.string.agreement_url)
             val agreementIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(agreementIntent)
         }
