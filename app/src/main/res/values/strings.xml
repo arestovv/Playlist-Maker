@@ -7,9 +7,9 @@
     <string name="share_app" translatable="false">Поделиться приложением</string>
     <string name="write_to_support" translatable="false">Написать в поддержку</string>
     <string name="user_agreement" translatable="false">Пользовательское соглашение</string>
-    <!-- Указал тестовый email так как не хочу выставлять данные в github-->
     <string name="share_info_message" translatable="false">Поделиться через</string>
     <string name="share_message" translatable="false">https://practicum.yandex.com/android-developer/</string>
+    <!-- Указал тестовый email так как не хочу выставлять данные в github-->
     <string name="email" translatable="false">test@yandex.com</string>
     <string name="email_subject" translatable="false">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
     <string name="email_body" translatable="false">Спасибо разработчикам и разработчицам за крутое приложение!</string>
