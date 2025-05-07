@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="StyleToolBarBack" parent="StyleToolBar">
+        <item name="navigationIcon">@drawable/ic_arrow_back</item>
+        <item name="navigationIconTint">@color/text_color_common_screen</item>
+    </style>
 
     <style name="StyleToolBar" parent="Widget.MaterialComponents.Toolbar">
         <item name="titleTextAppearance">@style/StyleToolBarText</item>
