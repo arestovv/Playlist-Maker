@@ -3,40 +3,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_main"
+    android:background="@color/background_main_screen"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/StyleToolBar"
         app:title="@string/app_name"
-        app:titleTextColor="@color/white"
-        app:titleTextAppearance="@style/TitleTextStyle"/>
+        app:titleTextColor="@color/text_color_title_main_screen"
+        />
 
     <Button
+        android:id="@+id/button_search"
         style="@style/MainScreenButton"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="8dp"
-        android:id="@+id/button_search"
         android:text="@string/search"
-        app:icon="@drawable/ic_search" />
+        app:icon="@drawable/ic_search"
+        />
 
     <Button
+        android:id="@+id/button_media"
         style="@style/MainScreenButton"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:id="@+id/button_media"
         android:text="@string/media"
-        app:icon="@drawable/ic_media" />
+        app:icon="@drawable/ic_media"
+        />
 
     <Button
+        android:id="@+id/button_setting"
         style="@style/MainScreenButton"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="28dp"
-        android:id="@+id/button_setting"
         android:text="@string/settings"
-        app:icon="@drawable/ic_setting" />
+        app:icon="@drawable/ic_setting"
+        />
 </LinearLayout>
 

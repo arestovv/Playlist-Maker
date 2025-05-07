@@ -1,7 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_search_screen"
+        style="@style/StyleToolBarBack"
+        app:title="@string/search"
+        />
+
+    <LinearLayout
+        android:id="@+id/search_container_search_screen"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
+        android:background="@drawable/search_radius"
+        android:orientation="horizontal"
+        >
+
+        <EditText
+            android:id="@+id/search_view_search_screen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:drawableStart="@drawable/ic_search_input"
+            android:drawablePadding="4dp"
+            android:hint="@string/search"
+            android:inputType="text"
+            android:maxLength="25"
+            android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:saveEnabled="false"
+            android:textColor="@color/black"
+            android:textColorHint="@color/color_edit_text_search_screen"
+            android:textSize="16sp"
+            />
+
+        <ImageView
+            android:id="@+id/clear_icon_search_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:visibility="gone"
+            />
+    </LinearLayout>
 </LinearLayout>
