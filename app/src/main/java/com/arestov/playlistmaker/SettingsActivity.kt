@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textview.MaterialTextView
 
@@ -35,8 +36,8 @@ class SettingsActivity : AppCompatActivity() {
             val subject = getString(R.string.email_subject)
             val body = getString(R.string.email_body)
             val emailIntent = Intent(Intent.ACTION_SENDTO)
-            val uriText = "mailto:$email?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}"
-            emailIntent.data = Uri.parse(uriText)
+            val text = "mailto:$email?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}"
+            emailIntent.data = text.toUri()
             startActivity(emailIntent)
         }
 

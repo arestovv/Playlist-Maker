@@ -2,14 +2,14 @@ package com.arestov.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
+import androidx.core.widget.doOnTextChanged
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
@@ -21,7 +21,7 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val searchContainer = findViewById<LinearLayout>(R.id.search_container_search_screen)
+        val searchContainer = findViewById<FrameLayout>(R.id.search_container_search_screen)
         inputEditText = findViewById(R.id.search_view_search_screen)
         clearButton = findViewById(R.id.clear_icon_search_view)
 
@@ -34,6 +34,7 @@ class SearchActivity : AppCompatActivity() {
         //Clear text
         clearButton.setOnClickListener {
             inputEditText.setText("")
+            //Hide keyboard
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(clearButton.windowToken, 0)
         }
@@ -46,22 +47,15 @@ class SearchActivity : AppCompatActivity() {
             imm.showSoftInput(searchContainer, InputMethodManager.SHOW_IMPLICIT)
         }
 
-        val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            //Show button clear
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearButton.visibility = clearButtonVisibility(s)
-            }
-
-            //Save text after write
-            override fun afterTextChanged(s: Editable?) {
-                text = s.toString()
-            }
+        //Show button clear
+        inputEditText.doOnTextChanged { text, _, _, _ ->
+            clearButton.isVisible = !text.isNullOrEmpty()
         }
-        //Add listener
-        inputEditText.addTextChangedListener(textWatcher)
+
+        //Save text after write
+        inputEditText.doAfterTextChanged { input ->
+            text = input.toString()
+        }
     }
 
     //Save state
@@ -75,19 +69,11 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         text = savedInstanceState.getString(SEARCH_TEXT, "")
         inputEditText.setText(text)
-        clearButton.visibility = clearButtonVisibility(text)
+        clearButton.isVisible = !inputEditText.text.isNullOrEmpty()
+
     }
 
     companion object {
         const val SEARCH_TEXT = "SEARCH_TEXT"
-    }
-}
-
-//Show or hide clear button
-private fun clearButtonVisibility(s: CharSequence?): Int {
-    return if (s.isNullOrEmpty()) {
-        View.GONE
-    } else {
-        View.VISIBLE
     }
 }

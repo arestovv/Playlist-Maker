@@ -2,13 +2,11 @@
 <resources>
     <style name="StyleToolBarBack" parent="StyleToolBar">
         <item name="navigationIcon">@drawable/ic_arrow_back</item>
-        <item name="navigationIconTint">@color/text_color_common_screen</item>
+        <item name="navigationIconTint">@color/text_color</item>
     </style>
 
     <style name="StyleToolBar" parent="Widget.MaterialComponents.Toolbar">
         <item name="titleTextAppearance">@style/StyleToolBarText</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">match_parent</item>
     </style>
 
     <style name="StyleToolBarText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
