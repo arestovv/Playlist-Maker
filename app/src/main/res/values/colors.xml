@@ -15,6 +15,7 @@
 
     <!--Search-->
     <color name="color_edit_search_screen">#AEAFB4</color>
+    <color name="text_color_edit_search_screen">#1A1B22</color>
 
     <!---->
     <color name="text_color">#FF000000</color>
