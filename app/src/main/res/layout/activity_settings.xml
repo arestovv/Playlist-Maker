@@ -3,38 +3,54 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_setting"
+    android:background="@color/background_setting_screen"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/top_panel_settings_screen"
+        android:id="@+id/toolbar_settings_screen"
+        style="@style/StyleToolBarBack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        app:navigationIcon="@drawable/ic_arrow_back"
         app:title="@string/settings"
-        app:titleTextAppearance="@style/TitleTextStyle" />
+        />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         style="@style/SettingScreenTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/dark_theme"
         android:thumb="@drawable/switch_thumb_selector"
         app:track="@drawable/switch_track_selector"
-        app:useMaterialThemeColors="false" />
+        app:useMaterialThemeColors="false"
+        />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/button_share"
         style="@style/SettingScreenTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:drawableEnd="@drawable/ic_share"
-        android:text="@string/share_app" />
+        android:text="@string/share_app"
+        />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/button_support"
         style="@style/SettingScreenTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:drawableEnd="@drawable/ic_support"
-        android:text="@string/write_to_support" />
+        android:text="@string/write_to_support"
+        />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/button_agreement"
         style="@style/SettingScreenTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:drawableEnd="@drawable/ic_arrow"
-        android:text="@string/user_agreement" />
+        android:text="@string/user_agreement"
+        />
 </LinearLayout>
