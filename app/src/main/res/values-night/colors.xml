@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <color name="text_color">@color/yp_white</color>
+
     <!--Main-->
-    <color name="icon_color_main_screen">#1A1B22</color>
-    <color name="background_main_screen">#1A1B22</color>
+    <color name="icon_color_main_screen">@color/yp_black</color>
+    <color name="background_main_screen">@color/yp_black</color>
 
     <!--Settings-->
-    <color name="background_setting_screen">#1A1B22</color>
-    <color name="icon_color_setting_screen">#FFFFFF</color>
+    <color name="background_setting_screen">@color/yp_black</color>
+    <color name="icon_color_setting_screen">@color/yp_white</color>
 
     <!--Search-->
-    <color name="color_edit_search_screen">#1A1B22</color>
-
-    <color name="text_color">#FFFFFF</color>
-
+    <color name="background_search_screen">@color/yp_black</color>
+    <color name="color_input_search_screen">@color/yp_white</color>
+    <color name="color_edit_search_screen">@color/yp_black</color>
+    <color name="color_track_view_search_screen">@color/yp_white</color>
 </resources>
 

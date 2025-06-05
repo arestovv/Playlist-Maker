@@ -5,6 +5,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_search_screen"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     >
@@ -64,4 +65,11 @@
             android:visibility="gone"
             />
     </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingVertical="24dp"
+        />
 </LinearLayout>
