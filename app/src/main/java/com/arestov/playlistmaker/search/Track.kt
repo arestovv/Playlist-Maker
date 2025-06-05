@@ -1,8 +1,8 @@
 package com.arestov.playlistmaker.search
 
 data class Track(
-    val name: String,
-    val artist: String,
-    val time: String,
-    val url: String,
+    val trackName: String,
+    val artistName: String,
+    val trackTimeMillis: Long,
+    val artworkUrl100: String,
 )
