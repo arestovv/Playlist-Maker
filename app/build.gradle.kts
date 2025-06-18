@@ -46,4 +46,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 }

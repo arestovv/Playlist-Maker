@@ -16,5 +16,6 @@
     <color name="color_input_search_screen">@color/yp_white</color>
     <color name="color_edit_search_screen">@color/yp_black</color>
     <color name="color_track_view_search_screen">@color/yp_white</color>
+    <color name="color_container_info">@color/yp_white</color>
 </resources>
 

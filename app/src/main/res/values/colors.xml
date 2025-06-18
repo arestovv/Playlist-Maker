@@ -22,6 +22,7 @@
     <color name="color_edit_search_screen">@color/yp_text_gray</color>
     <color name="text_color_edit_search_screen">@color/yp_black</color>
     <color name="color_track_view_search_screen">@color/yp_text_gray</color>
+    <color name="color_container_info">@color/yp_black</color>
 
     <!--Colors-->
     <color name="yp_white">#FFFFFF</color>
