@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.arestov.playlistmaker.search.SearchActivity
 
 const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
 const val SWITCH_STATE_KEY = "switch_state_key"

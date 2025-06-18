@@ -1,6 +1,7 @@
-package com.arestov.playlistmaker
+package com.arestov.playlistmaker.search
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -17,16 +18,12 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.arestov.playlistmaker.search.ITunesApi
-import com.arestov.playlistmaker.search.Track
-import com.arestov.playlistmaker.search.TrackAdapter
-import com.arestov.playlistmaker.search.TrackResponse
+import com.arestov.playlistmaker.PLAYLIST_MAKER_PREFERENCES
+import com.arestov.playlistmaker.R
+import com.arestov.playlistmaker.search.itunes.ITunesClientApi
+import com.arestov.playlistmaker.search.track.Track
+import com.arestov.playlistmaker.search.track.TrackAdapter
 import com.google.android.material.appbar.MaterialToolbar
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
     companion object {
@@ -34,7 +31,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private var text = ""
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var trackRecyclerView: RecyclerView
     private lateinit var inputEditText: EditText
     private lateinit var clearButton: ImageView
 
@@ -43,23 +40,40 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var infoContainerText: TextView
     private lateinit var infoContainerButton: Button
 
+    private lateinit var sharedPrefs: SharedPreferences
+    private lateinit var history: SearchHistory
+    private lateinit var historyContainer: LinearLayout
+    private lateinit var historyRecyclerView: RecyclerView
+    private lateinit var clearHistoryButton: Button
+    private lateinit var tracksHistoryAdapter: TrackAdapter
+
     private var tracks = ArrayList<Track>()
-    private val trackAdapter = TrackAdapter(tracks)
-    private val iTunesBaseUrl = "https://itunes.apple.com"
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(iTunesBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    private val iTunesService = retrofit.create(ITunesApi::class.java)
+    private lateinit var trackAdapter: TrackAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        //RecyclerView for history tracks
+        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+        history = SearchHistory(sharedPrefs)
+        historyRecyclerView = findViewById(R.id.historyRecyclerView)
+        historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        clearHistoryButton = findViewById(R.id.history_clear_button)
+        tracksHistoryAdapter = TrackAdapter(history.getTracks()) { track ->
+            history.addTrack(track)
+            updateHistory()
+        }
+        historyRecyclerView.adapter = tracksHistoryAdapter
+
+
         //RecyclerView for tracks
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = trackAdapter
+        trackRecyclerView = findViewById(R.id.recyclerView)
+        trackRecyclerView.layoutManager = LinearLayoutManager(this)
+        trackAdapter = TrackAdapter(tracks) { track ->
+            history.addTrack(track)
+        }
+        trackRecyclerView.adapter = trackAdapter
 
         //search field
         val searchContainer = findViewById<FrameLayout>(R.id.search_container_search_screen)
@@ -71,6 +85,10 @@ class SearchActivity : AppCompatActivity() {
         infoContainerImage = findViewById(R.id.info_container_image)
         infoContainerText = findViewById(R.id.info_container_text)
         infoContainerButton = findViewById(R.id.info_container_button)
+
+        //History container
+        historyContainer = findViewById(R.id.history_container)
+        historyRecyclerView = findViewById(R.id.historyRecyclerView)
 
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_search_screen)
@@ -94,6 +112,17 @@ class SearchActivity : AppCompatActivity() {
             requestToITunes()
         }
 
+        //Set focus to input when open view
+        inputEditText.post {
+            inputEditText.requestFocus()
+        }
+
+        //Focus listener
+        inputEditText.setOnFocusChangeListener { view, hasFocus ->
+            //Show history if has tracks and input has focus and empty
+            shouldShowHistory()
+        }
+
         //Click to search input
         searchContainer.setOnClickListener {
             searchContainer.requestFocus()
@@ -102,9 +131,10 @@ class SearchActivity : AppCompatActivity() {
             imm.showSoftInput(searchContainer, InputMethodManager.SHOW_IMPLICIT)
         }
 
-        //Show button clear
         inputEditText.doOnTextChanged { text, _, _, _ ->
+            //Show button clear if input has text
             clearButton.isVisible = !text.isNullOrEmpty()
+            shouldShowHistory()
         }
 
         //Save text after write
@@ -121,28 +151,23 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
+
+        //clear button for close and clear history track
+        clearHistoryButton.setOnClickListener {
+            history.clear()
+            hideHistory()
+        }
     }
 
-    //fun for get data from itunes
+    //fun for get data from itunes api
     private fun requestToITunes() {
         val searchText = inputEditText.text.toString()
-        iTunesService.search(searchText).enqueue(object : Callback<TrackResponse> {
-            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
-                //response from itunes api
-                val results = response.body()?.results.orEmpty()
-                when {
-                    //if success and not empty
-                    response.isSuccessful && results.isNotEmpty() -> showTracks(results)
-                    //if nothing found
-                    response.isSuccessful -> showNothingFound()
-                    //if error
-                    else -> showNetworkProblem()
-                }
-            }
-            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                showNetworkProblem()
-            }
-        })
+        ITunesClientApi().searchTracks(
+            text = searchText,
+            onSuccess = { showTracks(it) },
+            onEmpty = { showNothingFound() },
+            onError = { showNetworkProblem() }
+        )
     }
 
     //Show tracks content
@@ -151,7 +176,7 @@ class SearchActivity : AppCompatActivity() {
         tracks.addAll(results)
         trackAdapter.notifyDataSetChanged()
 
-        recyclerView.isVisible = true
+        trackRecyclerView.isVisible = true
         infoContainer.isGone = true
     }
 
@@ -160,7 +185,7 @@ class SearchActivity : AppCompatActivity() {
         infoContainerImage.setImageResource(R.drawable.ic_network_problem)
         infoContainerText.setText(R.string.network_problem)
 
-        recyclerView.isGone = true
+        trackRecyclerView.isGone = true
         infoContainerButton.isVisible = true
         infoContainer.isVisible = true
     }
@@ -170,16 +195,45 @@ class SearchActivity : AppCompatActivity() {
         infoContainerImage.setImageResource(R.drawable.ic_nothing_found)
         infoContainerText.setText(R.string.nothing_found)
 
-        recyclerView.isGone = true
+        trackRecyclerView.isGone = true
         infoContainerButton.isGone = true
         infoContainer.isVisible = true
     }
 
     //Hide recyclerView and infoContainer
     private fun hideContent() {
-        recyclerView.isGone = true
+        trackRecyclerView.isGone = true
         infoContainerButton.isGone = true
         infoContainer.isGone = true
+    }
+
+    //Show history if list has tracks and input has focus and empty
+    private fun shouldShowHistory() {
+        if (inputEditText.hasFocus()
+            && inputEditText.text.isEmpty()
+            && history.hasTracks()
+        ) {
+            showHistory()
+        } else {
+            hideHistory()
+        }
+
+    }
+
+    //Show history container
+    private fun showHistory() {
+        updateHistory()
+        historyContainer.isVisible = true
+    }
+
+    //Update adapter
+    private fun updateHistory() {
+        tracksHistoryAdapter.notifyDataSetChanged()
+    }
+
+    //Hide history container
+    private fun hideHistory() {
+        historyContainer.isVisible = false
     }
 
     //Save state

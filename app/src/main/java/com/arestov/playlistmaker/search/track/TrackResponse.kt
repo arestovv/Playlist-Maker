@@ -1,6 +1,4 @@
-package com.arestov.playlistmaker.search
-
-import java.net.URL
+package com.arestov.playlistmaker.search.track
 
 class TrackResponse(
     val resultCount: Int,
