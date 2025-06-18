@@ -54,6 +54,9 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        //KeyBoard state
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
         //RecyclerView for history tracks
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
         history = SearchHistory(sharedPrefs)
@@ -62,7 +65,7 @@ class SearchActivity : AppCompatActivity() {
         clearHistoryButton = findViewById(R.id.history_clear_button)
         tracksHistoryAdapter = TrackAdapter(history.getTracks()) { track ->
             history.addTrack(track)
-            updateHistory()
+            updateHistoryAdapter()
         }
         historyRecyclerView.adapter = tracksHistoryAdapter
 
@@ -101,7 +104,6 @@ class SearchActivity : AppCompatActivity() {
             //clear text
             inputEditText.setText("")
             //Hide keyboard
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(clearButton.windowToken, 0)
             //hide tracks or container info
             hideContent()
@@ -127,13 +129,15 @@ class SearchActivity : AppCompatActivity() {
         searchContainer.setOnClickListener {
             searchContainer.requestFocus()
             //Show keyboard
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(searchContainer, InputMethodManager.SHOW_IMPLICIT)
         }
 
         inputEditText.doOnTextChanged { text, _, _, _ ->
             //Show button clear if input has text
             clearButton.isVisible = !text.isNullOrEmpty()
+            //Hide track content when input empty
+            if (text.isNullOrEmpty()) hideContent()
+            //Show history if has tracks and input has focus and empty
             shouldShowHistory()
         }
 
@@ -222,12 +226,12 @@ class SearchActivity : AppCompatActivity() {
 
     //Show history container
     private fun showHistory() {
-        updateHistory()
+        updateHistoryAdapter()
         historyContainer.isVisible = true
     }
 
     //Update adapter
-    private fun updateHistory() {
+    private fun updateHistoryAdapter() {
         tracksHistoryAdapter.notifyDataSetChanged()
     }
 

@@ -111,6 +111,7 @@
             android:paddingTop="16dp"
             android:textAlignment="center"
             />
+
         <!-- Button retry request   -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/info_container_button"
@@ -129,7 +130,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone"
         >
 
         <!--  History message  -->
@@ -148,7 +148,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/historyRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:paddingVertical="24dp"
             />
 
