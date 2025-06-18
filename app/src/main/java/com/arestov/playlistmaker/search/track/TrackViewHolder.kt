@@ -1,4 +1,4 @@
-package com.arestov.playlistmaker.search
+package com.arestov.playlistmaker.search.track
 
 import android.content.Context
 import android.util.TypedValue

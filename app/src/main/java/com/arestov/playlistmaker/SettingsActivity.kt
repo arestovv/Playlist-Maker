@@ -6,17 +6,33 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
         setContentView(R.layout.activity_settings)
 
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_settings_screen)
         back.setNavigationOnClickListener {
             finish()
+        }
+
+        //Switch theme
+        val switcherTheme = findViewById<SwitchMaterial>(R.id.switcher_theme)
+        //Set switcher state from file preferences
+        switcherTheme.isChecked = sharedPrefs.getBoolean(SWITCH_STATE_KEY, false)
+        //Switch listener
+        switcherTheme.setOnCheckedChangeListener { switcher, checked ->
+            //Save switcher state to file preferences
+            (applicationContext as App).switchTheme(checked)
+            sharedPrefs.edit()
+                .putBoolean(SWITCH_STATE_KEY, checked)
+                .apply()
         }
 
         //Share app

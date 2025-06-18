@@ -18,6 +18,7 @@
         />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switcher_theme"
         style="@style/SettingScreenTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
