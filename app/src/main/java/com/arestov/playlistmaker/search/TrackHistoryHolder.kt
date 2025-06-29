@@ -7,7 +7,7 @@ import com.google.gson.reflect.TypeToken
 
 const val TRACK_HISTORY_KEY = "track_history"
 
-class SearchHistory(private val sharedPreferences: SharedPreferences) {
+class TrackHistoryHolder(private val sharedPreferences: SharedPreferences) {
 
     private var listTracks = ArrayList<Track>()
 
@@ -16,6 +16,13 @@ class SearchHistory(private val sharedPreferences: SharedPreferences) {
         listTracks = getListFromPrefs()
         return listTracks
     }
+
+    //Get first track from list (selected track)
+    fun getFirstTrack(): Track {
+        listTracks = getListFromPrefs()
+        return listTracks.first()
+    }
+
 
     //Return is list has track
     fun hasTracks(): Boolean {
@@ -30,7 +37,7 @@ class SearchHistory(private val sharedPreferences: SharedPreferences) {
             listTracks.removeAt(existingIndex)
         //if tracks more 10 remove last
         } else if (listTracks.size >= 10){
-            listTracks.removeLast()
+            listTracks.removeAt(listTracks.size - 1)
         }
         //add track to list
         listTracks.add(0, track)

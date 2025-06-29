@@ -10,8 +10,8 @@
     <!--Settings-->
     <color name="background_setting_screen">@color/yp_white</color>
     <color name="icon_color_main_screen">@color/yp_black</color>
-    <color name="icon_color_setting_screen">@color/yp_text_gray</color>
-    <color name="icon_knob_off_setting_screen">@color/yp_text_gray</color>
+    <color name="icon_color_setting_screen">@color/yp_gray</color>
+    <color name="icon_knob_off_setting_screen">@color/yp_gray</color>
     <color name="icon_knob_on_setting_screen">#3772E7</color>
     <color name="icon_track_off_setting_screen">#E6E8EB</color>
     <color name="icon_track_on_setting_screen">#9FBBF3</color>
@@ -19,14 +19,19 @@
     <!--Search-->
     <color name="background_search_screen">@color/yp_white</color>
     <color name="color_input_search_screen">@color/yp_light_gray</color>
-    <color name="color_edit_search_screen">@color/yp_text_gray</color>
+    <color name="color_edit_search_screen">@color/yp_gray</color>
     <color name="text_color_edit_search_screen">@color/yp_black</color>
-    <color name="color_track_view_search_screen">@color/yp_text_gray</color>
+    <color name="color_track_view_search_screen">@color/yp_gray</color>
     <color name="color_container_info">@color/yp_black</color>
+
+    <!--Player-->
+    <color name="background_player_screen">@color/yp_white</color>
+    <color name="color_buttons_player_screen">@color/yp_black</color>
 
     <!--Colors-->
     <color name="yp_white">#FFFFFF</color>
-    <color name="yp_text_gray">#AEAFB4</color>
+    <color name="yp_gray">#AEAFB4</color>
     <color name="yp_light_gray">#E6E8EB</color>
     <color name="yp_black">#1A1B22</color>
+    <color name="yp_red">#F56B6C</color>
 </resources>
