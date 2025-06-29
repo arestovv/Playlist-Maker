@@ -1,5 +1,6 @@
-package com.arestov.playlistmaker.search
+package com.arestov.playlistmaker.search.itunes
 
+import com.arestov.playlistmaker.search.track.TrackResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

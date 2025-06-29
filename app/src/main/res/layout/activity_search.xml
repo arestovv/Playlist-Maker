@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     >
-
+    <!-- Header Toolbar  -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_search_screen"
         style="@style/StyleToolBarBack"
@@ -18,6 +18,7 @@
         app:title="@string/search"
         />
 
+    <!--  Search field FrameLayout -->
     <FrameLayout
         android:id="@+id/search_container_search_screen"
         android:layout_width="match_parent"
@@ -28,6 +29,7 @@
         android:orientation="horizontal"
         >
 
+        <!-- Search icon -->
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,6 +38,7 @@
             android:src="@drawable/ic_search_input"
             />
 
+        <!-- Search input  -->
         <EditText
             android:id="@+id/search_view_search_screen"
             android:layout_width="match_parent"
@@ -57,8 +60,8 @@
             android:textCursorDrawable="@color/yp_black"
             android:textSize="16sp"
             />
-        />
 
+        <!--  Clean button      -->
         <ImageView
             android:id="@+id/clear_icon_search_view"
             android:layout_width="wrap_content"
@@ -70,6 +73,7 @@
             />
     </FrameLayout>
 
+    <!-- Tracks RecyclerView    -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -78,6 +82,7 @@
         android:visibility="gone"
         />
 
+    <!--  Info container  -->
     <LinearLayout
         android:id="@+id/info_container"
         android:layout_width="match_parent"
@@ -86,18 +91,19 @@
         android:visibility="gone"
         >
 
+        <!-- Info image  -->
         <ImageView
             android:id="@+id/info_container_image"
-            style="@style/InfoContainer"
+            style="@style/SearchScreenContainers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingTop="110dp"
             />
-
+        <!--  Info message  -->
         <TextView
             android:id="@+id/info_container_text"
-            style="@style/InfoContainer"
+            style="@style/SearchScreenContainers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -106,18 +112,56 @@
             android:textAlignment="center"
             />
 
+        <!-- Button retry request   -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/info_container_button"
-            style="@style/InfoContainer"
+            style="@style/SearchScreenButtons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="24dp"
-            android:backgroundTint="@color/color_container_info"
             android:text="@string/update"
-            android:textColor="@color/background_search_screen"
-            android:textSize="14sp"
-            app:cornerRadius="50dp"
+            />
+    </LinearLayout>
+
+    <!-- History container  -->
+    <LinearLayout
+        android:id="@+id/history_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <!--  History message  -->
+        <TextView
+            android:id="@+id/history_text"
+            style="@style/SearchScreenContainers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="44dp"
+            android:text="@string/your_history"
+            android:textAlignment="center"
+            />
+
+        <!-- History tracks RecyclerView    -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/historyRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingVertical="24dp"
+            />
+
+
+        <!-- Button clear history   -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/history_clear_button"
+            style="@style/SearchScreenButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/clear_history"
             />
     </LinearLayout>
 </LinearLayout>
