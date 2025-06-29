@@ -1,26 +1,41 @@
 package com.arestov.playlistmaker
 
-import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.arestov.playlistmaker.search.SearchActivity
+import com.arestov.playlistmaker.app.App
+import com.arestov.playlistmaker.utils.ScreensHolder
+import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 
 const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
-const val SWITCH_STATE_KEY = "switch_state_key"
+const val SWITCHER_DARK_THEME_STATE_KEY = "switcher_dark_theme_state_key"
+const val LAST_SCREEN_KEY = "last_screen_key"
+lateinit var sharedPrefs: SharedPreferences
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
 
         //Restore choose theme from file preferences
-        val sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        val isDark = sharedPrefs.getBoolean(SWITCH_STATE_KEY, false)
-        (applicationContext as App).switchTheme(isDark)
+        //Set theme
+        val isDark = (applicationContext as App).getTheme(sharedPrefs)
+        (applicationContext as App).setTheme(isDark, sharedPrefs)
+
+        //Open player screen if app was close on player screen
+        val screen = sharedPrefs.getInt(LAST_SCREEN_KEY, MAIN.get())
+        when (screen) {
+            PLAYER.get() -> {
+                ScreensHolder.launch(PLAYER, this)
+                finish()
+            }
+        }
 
         //Set main activity
         setContentView(R.layout.activity_main)
+        ScreensHolder.saveCodeScreen(MAIN, sharedPrefs)
 
         val buttonSearch = findViewById<Button>(R.id.button_search)
         val buttonMedia = findViewById<Button>(R.id.button_media)
@@ -28,20 +43,23 @@ class MainActivity : AppCompatActivity() {
 
         //Search clickListener
         buttonSearch.setOnClickListener {
-            val displayIntent = Intent(this, SearchActivity::class.java)
-            startActivity(displayIntent)
+            ScreensHolder.launch(SEARCH, this)
         }
 
         //Media clickListener
         buttonMedia.setOnClickListener {
-            val displayIntent = Intent(this, MediaActivity::class.java)
-            startActivity(displayIntent)
+            ScreensHolder.launch(MEDIA, this)
         }
 
         //Settings clickListener
         buttonSettings.setOnClickListener {
-            val displayIntent = Intent(this, SettingsActivity::class.java)
-            startActivity(displayIntent)
+            ScreensHolder.launch(SETTINGS, this)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+        ScreensHolder.saveCodeScreen(MAIN, sharedPrefs)
     }
 }

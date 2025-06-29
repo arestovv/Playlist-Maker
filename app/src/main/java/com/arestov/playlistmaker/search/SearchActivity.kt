@@ -1,6 +1,7 @@
 package com.arestov.playlistmaker.search
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
@@ -20,9 +21,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arestov.playlistmaker.PLAYLIST_MAKER_PREFERENCES
 import com.arestov.playlistmaker.R
+import com.arestov.playlistmaker.player.PlayerActivity
 import com.arestov.playlistmaker.search.itunes.ITunesClientApi
 import com.arestov.playlistmaker.search.track.Track
 import com.arestov.playlistmaker.search.track.TrackAdapter
+import com.arestov.playlistmaker.utils.ScreensHolder
+import com.arestov.playlistmaker.utils.ScreensHolder.Screens.MAIN
+import com.arestov.playlistmaker.utils.ScreensHolder.Screens.SEARCH
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
@@ -41,7 +46,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var infoContainerButton: Button
 
     private lateinit var sharedPrefs: SharedPreferences
-    private lateinit var history: SearchHistory
+    private lateinit var trackHistoryHolder: TrackHistoryHolder
     private lateinit var historyContainer: LinearLayout
     private lateinit var historyRecyclerView: RecyclerView
     private lateinit var clearHistoryButton: Button
@@ -57,24 +62,34 @@ class SearchActivity : AppCompatActivity() {
         //KeyBoard state
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
-        //RecyclerView for history tracks
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        history = SearchHistory(sharedPrefs)
+        ScreensHolder.saveCodeScreen(SEARCH, sharedPrefs)
+
+        //RecyclerView for history tracks
+        trackHistoryHolder = TrackHistoryHolder(sharedPrefs)
         historyRecyclerView = findViewById(R.id.historyRecyclerView)
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
         clearHistoryButton = findViewById(R.id.history_clear_button)
-        tracksHistoryAdapter = TrackAdapter(history.getTracks()) { track ->
-            history.addTrack(track)
-            updateHistoryAdapter()
+
+        //Listener for click on history track
+        tracksHistoryAdapter = TrackAdapter(trackHistoryHolder.getTracks()) { track ->
+            val displayIntent = Intent(this, PlayerActivity::class.java)
+            trackHistoryHolder.addTrack(track)
+            //Open Player screen
+            startActivity(displayIntent)
         }
         historyRecyclerView.adapter = tracksHistoryAdapter
-
 
         //RecyclerView for tracks
         trackRecyclerView = findViewById(R.id.recyclerView)
         trackRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        //Listener for click on track
         trackAdapter = TrackAdapter(tracks) { track ->
-            history.addTrack(track)
+            trackHistoryHolder.addTrack(track)
+            val displayIntent = Intent(this, PlayerActivity::class.java)
+            //Open Player screen
+            startActivity(displayIntent)
         }
         trackRecyclerView.adapter = trackAdapter
 
@@ -96,6 +111,7 @@ class SearchActivity : AppCompatActivity() {
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_search_screen)
         back.setNavigationOnClickListener {
+            ScreensHolder.launch(MAIN, this)
             finish()
         }
 
@@ -158,9 +174,16 @@ class SearchActivity : AppCompatActivity() {
 
         //clear button for close and clear history track
         clearHistoryButton.setOnClickListener {
-            history.clear()
+            trackHistoryHolder.clear()
             hideHistory()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+        ScreensHolder.saveCodeScreen(SEARCH, sharedPrefs)
+
     }
 
     //fun for get data from itunes api
@@ -215,7 +238,7 @@ class SearchActivity : AppCompatActivity() {
     private fun shouldShowHistory() {
         if (inputEditText.hasFocus()
             && inputEditText.text.isEmpty()
-            && history.hasTracks()
+            && trackHistoryHolder.hasTracks()
         ) {
             showHistory()
         } else {

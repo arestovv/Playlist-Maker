@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/trackRoot"
+    android:id="@+id/track_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -12,7 +12,7 @@
     >
 
     <ImageView
-        android:id="@+id/trackImage"
+        android:id="@+id/track_image"
         android:layout_width="44dp"
         android:layout_height="44dp"
         android:src="@drawable/ic_album_placeholder"
@@ -29,7 +29,7 @@
         >
 
         <TextView
-            android:id="@+id/trackName"
+            android:id="@+id/track_name"
             style="@style/TextTrackView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,21 +44,21 @@
             >
 
             <TextView
-                android:id="@+id/trackArtist"
+                android:id="@+id/track_artist"
                 style="@style/TextTrackView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 />
 
             <ImageView
-                android:id="@+id/ellipse"
+                android:id="@+id/track_ellipse"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 />
 
             <TextView
-                android:id="@+id/trackTime"
+                android:id="@+id/track_time"
                 style="@style/TextTrackView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
