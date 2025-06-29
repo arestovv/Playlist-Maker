@@ -70,6 +70,7 @@ class PlayerActivity : AppCompatActivity() {
             .transform(RoundedCorners(Converter.dpToPx(8f, this)))
             .into(imageAlbum)
 
+        tvTimer.text = Converter.mmToSs(30000)
         tvTrackName.text = track.trackName
         tvArtistName.text = track.artistName
         tvDurationValue.text = Converter.mmToSs(track.trackTimeMillis)

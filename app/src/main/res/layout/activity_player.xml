@@ -100,7 +100,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="@font/ys_display_medium"
-        android:text="0:30"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/button_play_player_screen"
         app:layout_constraintStart_toStartOf="@+id/button_play_player_screen"
