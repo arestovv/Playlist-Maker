@@ -2,8 +2,6 @@ package com.arestov.playlistmaker.utils
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import com.arestov.playlistmaker.LAST_SCREEN_KEY
 import com.arestov.playlistmaker.MainActivity
 import com.arestov.playlistmaker.media.MediaActivity
 import com.arestov.playlistmaker.player.PlayerActivity

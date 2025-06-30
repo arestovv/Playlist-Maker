@@ -10,7 +10,6 @@ import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 
 const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
 const val SWITCHER_DARK_THEME_STATE_KEY = "switcher_dark_theme_state_key"
-const val LAST_SCREEN_KEY = "last_screen_key"
 lateinit var sharedPrefs: SharedPreferences
 
 class MainActivity : AppCompatActivity() {
