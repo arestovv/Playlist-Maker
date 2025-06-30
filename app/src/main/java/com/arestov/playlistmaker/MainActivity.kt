@@ -25,11 +25,10 @@ class MainActivity : AppCompatActivity() {
         (applicationContext as App).setTheme(isDark, sharedPrefs)
 
         //Open player screen if app was close on player screen
-        val screen = sharedPrefs.getInt(LAST_SCREEN_KEY, MAIN.get())
+        val screen = sharedPrefs.getString(LAST_SCREEN_KEY, MAIN.name)
         when (screen) {
-            PLAYER.get() -> {
+            PLAYER.name -> {
                 ScreensHolder.launch(PLAYER, this)
-                finish()
             }
         }
 

@@ -26,8 +26,7 @@ import com.arestov.playlistmaker.search.itunes.ITunesClientApi
 import com.arestov.playlistmaker.search.track.Track
 import com.arestov.playlistmaker.search.track.TrackAdapter
 import com.arestov.playlistmaker.utils.ScreensHolder
-import com.arestov.playlistmaker.utils.ScreensHolder.Screens.MAIN
-import com.arestov.playlistmaker.utils.ScreensHolder.Screens.SEARCH
+import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
@@ -73,10 +72,9 @@ class SearchActivity : AppCompatActivity() {
 
         //Listener for click on history track
         tracksHistoryAdapter = TrackAdapter(trackHistoryHolder.getTracks()) { track ->
-            val displayIntent = Intent(this, PlayerActivity::class.java)
             trackHistoryHolder.addTrack(track)
             //Open Player screen
-            startActivity(displayIntent)
+            ScreensHolder.launch(PLAYER, this)
         }
         historyRecyclerView.adapter = tracksHistoryAdapter
 
@@ -87,9 +85,8 @@ class SearchActivity : AppCompatActivity() {
         //Listener for click on track
         trackAdapter = TrackAdapter(tracks) { track ->
             trackHistoryHolder.addTrack(track)
-            val displayIntent = Intent(this, PlayerActivity::class.java)
             //Open Player screen
-            startActivity(displayIntent)
+            ScreensHolder.launch(PLAYER, this)
         }
         trackRecyclerView.adapter = trackAdapter
 
@@ -111,7 +108,6 @@ class SearchActivity : AppCompatActivity() {
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_search_screen)
         back.setNavigationOnClickListener {
-            ScreensHolder.launch(MAIN, this)
             finish()
         }
 
@@ -136,7 +132,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         //Focus listener
-        inputEditText.setOnFocusChangeListener { view, hasFocus ->
+        inputEditText.setOnFocusChangeListener { _, _ ->
             //Show history if has tracks and input has focus and empty
             shouldShowHistory()
         }

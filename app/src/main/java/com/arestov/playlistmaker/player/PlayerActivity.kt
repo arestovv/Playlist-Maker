@@ -56,7 +56,7 @@ class PlayerActivity : AppCompatActivity() {
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_player_screen)
         back.setNavigationOnClickListener {
-            ScreensHolder.launch(SEARCH, this)
+            ScreensHolder.saveCodeScreen(MAIN, sharedPrefs)
             finish()
         }
 

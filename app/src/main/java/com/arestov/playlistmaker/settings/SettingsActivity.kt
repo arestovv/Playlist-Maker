@@ -11,7 +11,6 @@ import com.arestov.playlistmaker.PLAYLIST_MAKER_PREFERENCES
 import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.SWITCHER_DARK_THEME_STATE_KEY
 import com.arestov.playlistmaker.utils.ScreensHolder
-import com.arestov.playlistmaker.utils.ScreensHolder.Screens.MAIN
 import com.arestov.playlistmaker.utils.ScreensHolder.Screens.SETTINGS
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -30,7 +29,6 @@ class SettingsActivity : AppCompatActivity() {
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_settings_screen)
         back.setNavigationOnClickListener {
-            ScreensHolder.launch(MAIN, this)
             finish()
         }
 

@@ -9,6 +9,7 @@ import com.arestov.playlistmaker.media.MediaActivity
 import com.arestov.playlistmaker.player.PlayerActivity
 import com.arestov.playlistmaker.search.SearchActivity
 import com.arestov.playlistmaker.settings.SettingsActivity
+import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 
 class ScreensHolder {
     companion object {
@@ -16,7 +17,7 @@ class ScreensHolder {
         //Save last open screen to sharedPreferences
         fun saveCodeScreen(screen: Screens, sharedPreferences: SharedPreferences) {
             sharedPreferences.edit()
-                .putInt(LAST_SCREEN_KEY, screen.get())
+                .putString(LAST_SCREEN_KEY, screen.name)
                 .apply()
         }
 
@@ -29,25 +30,20 @@ class ScreensHolder {
         //Intent for launch fun
         private fun getIntent(screen: Screens, context: Context): Intent {
             return when (screen) {
-                Screens.MAIN -> Intent(context, MainActivity::class.java)
-                Screens.SEARCH -> Intent(context, SearchActivity::class.java)
-                Screens.MEDIA -> Intent(context, MediaActivity::class.java)
-                Screens.SETTINGS -> Intent(context, SettingsActivity::class.java)
-                Screens.PLAYER -> Intent(context, PlayerActivity::class.java)
+                MAIN -> Intent(context, MainActivity::class.java)
+                SEARCH -> Intent(context, SearchActivity::class.java)
+                MEDIA -> Intent(context, MediaActivity::class.java)
+                SETTINGS -> Intent(context, SettingsActivity::class.java)
+                PLAYER -> Intent(context, PlayerActivity::class.java)
             }
         }
     }
 
-    //Code screen
-    enum class Screens(private val num: Int) {
-        MAIN(0),
-        SEARCH(1),
-        MEDIA(2),
-        SETTINGS(3),
-        PLAYER(4);
-
-        fun get(): Int {
-            return num
-        }
+    enum class Screens() {
+        MAIN,
+        SEARCH,
+        MEDIA,
+        SETTINGS,
+        PLAYER
     }
 }
