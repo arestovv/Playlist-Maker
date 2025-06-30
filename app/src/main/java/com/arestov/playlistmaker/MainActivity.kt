@@ -24,17 +24,8 @@ class MainActivity : AppCompatActivity() {
         val isDark = (applicationContext as App).getTheme(sharedPrefs)
         (applicationContext as App).setTheme(isDark, sharedPrefs)
 
-        //Open player screen if app was close on player screen
-        val screen = sharedPrefs.getString(LAST_SCREEN_KEY, MAIN.name)
-        when (screen) {
-            PLAYER.name -> {
-                ScreensHolder.launch(PLAYER, this)
-            }
-        }
-
         //Set main activity
         setContentView(R.layout.activity_main)
-        ScreensHolder.saveCodeScreen(MAIN, sharedPrefs)
 
         val buttonSearch = findViewById<Button>(R.id.button_search)
         val buttonMedia = findViewById<Button>(R.id.button_media)
@@ -54,11 +45,5 @@ class MainActivity : AppCompatActivity() {
         buttonSettings.setOnClickListener {
             ScreensHolder.launch(SETTINGS, this)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        ScreensHolder.saveCodeScreen(MAIN, sharedPrefs)
     }
 }

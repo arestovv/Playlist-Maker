@@ -24,7 +24,6 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        ScreensHolder.saveCodeScreen(SETTINGS, sharedPrefs)
 
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_settings_screen)
@@ -71,11 +70,5 @@ class SettingsActivity : AppCompatActivity() {
             val agreementIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(agreementIntent)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        ScreensHolder.saveCodeScreen(SETTINGS, sharedPrefs)
     }
 }

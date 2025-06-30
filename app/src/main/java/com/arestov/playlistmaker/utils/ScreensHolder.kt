@@ -14,13 +14,6 @@ import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 class ScreensHolder {
     companion object {
 
-        //Save last open screen to sharedPreferences
-        fun saveCodeScreen(screen: Screens, sharedPreferences: SharedPreferences) {
-            sharedPreferences.edit()
-                .putString(LAST_SCREEN_KEY, screen.name)
-                .apply()
-        }
-
         //launch screen
         fun launch(screen: Screens, context: Context,) {
             val intent = getIntent(screen, context)

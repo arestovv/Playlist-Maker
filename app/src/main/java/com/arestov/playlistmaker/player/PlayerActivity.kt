@@ -25,8 +25,8 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
+
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        ScreensHolder.saveCodeScreen(PLAYER, sharedPrefs)
         historyHolder = TrackHistoryHolder(sharedPrefs)
 
         //mock for add track favorite
@@ -56,7 +56,6 @@ class PlayerActivity : AppCompatActivity() {
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_player_screen)
         back.setNavigationOnClickListener {
-            ScreensHolder.saveCodeScreen(MAIN, sharedPrefs)
             finish()
         }
 
@@ -121,11 +120,5 @@ class PlayerActivity : AppCompatActivity() {
                 trackIsHasPlaylist = true
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        ScreensHolder.saveCodeScreen(PLAYER, sharedPrefs)
     }
 }

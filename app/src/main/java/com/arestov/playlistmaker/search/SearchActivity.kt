@@ -62,7 +62,6 @@ class SearchActivity : AppCompatActivity() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        ScreensHolder.saveCodeScreen(SEARCH, sharedPrefs)
 
         //RecyclerView for history tracks
         trackHistoryHolder = TrackHistoryHolder(sharedPrefs)
@@ -177,9 +176,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        ScreensHolder.saveCodeScreen(SEARCH, sharedPrefs)
-
+        updateHistoryAdapter()
     }
 
     //fun for get data from itunes api
