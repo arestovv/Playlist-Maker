@@ -27,6 +27,7 @@ class SettingsActivity : AppCompatActivity() {
 
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_settings_screen)
+        back.navigationContentDescription = getString(R.string.settings)
         back.setNavigationOnClickListener {
             finish()
         }
