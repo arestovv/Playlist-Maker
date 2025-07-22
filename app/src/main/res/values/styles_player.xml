@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TextBase">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="TrackName" parent="TextBase">
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="ArtistName" parent="TextBase">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+
+    <style name="TextLabel">
+        <item name="android:textColor">@color/yp_gray</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextValue" parent="TextBase">
+        <item name="android:textSize">13sp</item>
+        <item name="android:maxLength">40</item>
+    </style>
+</resources>
