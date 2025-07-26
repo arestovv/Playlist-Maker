@@ -1,16 +1,15 @@
 package com.arestov.playlistmaker.search
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
@@ -21,10 +20,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arestov.playlistmaker.PLAYLIST_MAKER_PREFERENCES
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.player.PlayerActivity
 import com.arestov.playlistmaker.search.itunes.ITunesClientApi
 import com.arestov.playlistmaker.search.track.Track
 import com.arestov.playlistmaker.search.track.TrackAdapter
+import com.arestov.playlistmaker.utils.Debounce
 import com.arestov.playlistmaker.utils.ScreensHolder
 import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 import com.google.android.material.appbar.MaterialToolbar
@@ -43,6 +42,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var infoContainerImage: ImageView
     private lateinit var infoContainerText: TextView
     private lateinit var infoContainerButton: Button
+    private lateinit var progressBar: ProgressBar
 
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var trackHistoryHolder: TrackHistoryHolder
@@ -53,6 +53,9 @@ class SearchActivity : AppCompatActivity() {
 
     private var tracks = ArrayList<Track>()
     private lateinit var trackAdapter: TrackAdapter
+
+    //Thread for showing the result while typing
+    private val requestToITunesRunnable = Runnable { requestToITunes() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,9 +74,11 @@ class SearchActivity : AppCompatActivity() {
 
         //Listener for click on history track
         tracksHistoryAdapter = TrackAdapter(trackHistoryHolder.getTracks()) { track ->
-            trackHistoryHolder.addTrack(track)
-            //Open Player screen
-            ScreensHolder.launch(PLAYER, this)
+            if (Debounce.isClickAllowed()) {
+                trackHistoryHolder.addTrack(track)
+                //Open Player screen
+                ScreensHolder.launch(PLAYER, this)
+            }
         }
         historyRecyclerView.adapter = tracksHistoryAdapter
 
@@ -83,11 +88,16 @@ class SearchActivity : AppCompatActivity() {
 
         //Listener for click on track
         trackAdapter = TrackAdapter(tracks) { track ->
-            trackHistoryHolder.addTrack(track)
-            //Open Player screen
-            ScreensHolder.launch(PLAYER, this)
+            if (Debounce.isClickAllowed()) {
+                trackHistoryHolder.addTrack(track)
+                //Open Player screen
+                ScreensHolder.launch(PLAYER, this)
+            }
         }
         trackRecyclerView.adapter = trackAdapter
+
+        //Progress bar
+        progressBar = findViewById(R.id.progress_bar)
 
         //search field
         val searchContainer = findViewById<FrameLayout>(R.id.search_container_search_screen)
@@ -144,6 +154,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         inputEditText.doOnTextChanged { text, _, _, _ ->
+            Debounce.searchDebounce(requestToITunesRunnable)
             //Show button clear if input has text
             clearButton.isVisible = !text.isNullOrEmpty()
             //Hide track content when input empty
@@ -155,16 +166,6 @@ class SearchActivity : AppCompatActivity() {
         //Save text after write
         inputEditText.doAfterTextChanged { input ->
             text = input.toString()
-        }
-
-        //click button Done on keyboard
-        inputEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if (inputEditText.text.isNotEmpty()) {
-                    requestToITunes()
-                }
-            }
-            false
         }
 
         //clear button for close and clear history track
@@ -182,12 +183,24 @@ class SearchActivity : AppCompatActivity() {
     //fun for get data from itunes api
     private fun requestToITunes() {
         val searchText = inputEditText.text.toString()
-        ITunesClientApi().searchTracks(
-            text = searchText,
-            onSuccess = { showTracks(it) },
-            onEmpty = { showNothingFound() },
-            onError = { showNetworkProblem() }
-        )
+        if (searchText.isNotEmpty()) {
+            //show progress bar
+            showProgressBar()
+            ITunesClientApi().searchTracks(
+                text = searchText,
+                onSuccess = { showTracks(it) },
+                onEmpty = { showNothingFound() },
+                onError = { showNetworkProblem() }
+            )
+        }
+    }
+
+    //Show progress bar
+    private fun showProgressBar() {
+        trackRecyclerView.isGone = true
+        infoContainerButton.isGone = true
+        infoContainer.isGone = true
+        progressBar.isVisible = true
     }
 
     //Show tracks content
@@ -198,6 +211,7 @@ class SearchActivity : AppCompatActivity() {
 
         trackRecyclerView.isVisible = true
         infoContainer.isGone = true
+        progressBar.isGone = true
     }
 
     //Show image, button and text network problem
@@ -208,6 +222,7 @@ class SearchActivity : AppCompatActivity() {
         trackRecyclerView.isGone = true
         infoContainerButton.isVisible = true
         infoContainer.isVisible = true
+        progressBar.isGone = true
     }
 
     //Show image and text nothing found
@@ -218,6 +233,7 @@ class SearchActivity : AppCompatActivity() {
         trackRecyclerView.isGone = true
         infoContainerButton.isGone = true
         infoContainer.isVisible = true
+        progressBar.isGone = true
     }
 
     //Hide recyclerView and infoContainer

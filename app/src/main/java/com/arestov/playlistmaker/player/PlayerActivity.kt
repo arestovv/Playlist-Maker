@@ -9,18 +9,24 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.Group
 import com.arestov.playlistmaker.PLAYLIST_MAKER_PREFERENCES
 import com.arestov.playlistmaker.R
+import com.arestov.playlistmaker.player.MediaPlayerHelper.Companion.STATE_PAUSED
+import com.arestov.playlistmaker.player.MediaPlayerHelper.Companion.STATE_PLAYING
+import com.arestov.playlistmaker.player.MediaPlayerHelper.Companion.STATE_PREPARED
 import com.arestov.playlistmaker.search.TrackHistoryHolder
 import com.arestov.playlistmaker.utils.Converter
-import com.arestov.playlistmaker.utils.ScreensHolder
-import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.appbar.MaterialToolbar
 
+
 private lateinit var historyHolder: TrackHistoryHolder
 lateinit var sharedPrefs: SharedPreferences
+lateinit var mediaPlayerHelper: MediaPlayerHelper
 
 class PlayerActivity : AppCompatActivity() {
+
+    private lateinit var buttonPlay: ImageView
+    private lateinit var tvTimer: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,11 +34,12 @@ class PlayerActivity : AppCompatActivity() {
 
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
         historyHolder = TrackHistoryHolder(sharedPrefs)
+        //Get selected track
+        val track = historyHolder.getFirstTrack()
+        mediaPlayerHelper = MediaPlayerHelper(track)
 
         //mock for add track favorite
         var trackIsFavorite = false
-        //mock for play track
-        var trackIsPlay = false
         //mock add to playlist
         var trackIsHasPlaylist = false
 
@@ -40,10 +47,10 @@ class PlayerActivity : AppCompatActivity() {
         val tvTrackName: TextView = findViewById(R.id.track_name_player_screen)
         val tvArtistName: TextView = findViewById(R.id.artist_name_player_screen)
 
+        buttonPlay = findViewById(R.id.button_play_player_screen)
+        tvTimer = findViewById(R.id.text_timer_player_screen)
         val buttonAddToPlayList: ImageView = findViewById(R.id.button_add_to_playlist_player_screen)
-        val buttonPlay: ImageView = findViewById(R.id.button_play_player_screen)
         val buttonAddToFavorite: ImageView = findViewById(R.id.button_add_to_favorite_player_screen)
-        val tvTimer: TextView = findViewById(R.id.text_timer_player_screen)
 
         val tvDurationValue: TextView = findViewById(R.id.value_duration_player_screen)
         val tvAlbumValue: TextView = findViewById(R.id.value_album_player_screen)
@@ -59,9 +66,6 @@ class PlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        //Get selected track
-        val track = historyHolder.getFirstTrack()
-
         //Set image album
         Glide.with(imageAlbum)
             .load(track.getArtworkUrl512())
@@ -69,21 +73,23 @@ class PlayerActivity : AppCompatActivity() {
             .transform(RoundedCorners(Converter.dpToPx(8f, this)))
             .into(imageAlbum)
 
-        tvTimer.text = Converter.mmToSs(30000)
+        tvTimer.text = Converter.mmToSs(0)
         tvTrackName.text = track.trackName
         tvArtistName.text = track.artistName
         tvDurationValue.text = Converter.mmToSs(track.trackTimeMillis)
         tvGenre.text = track.primaryGenreName
         tvCountry.text = track.country
 
+        prepareMediaPlayer()
+
         //Show album name
-        if (!track.collectionName.isNullOrEmpty()) {
+        if (track.collectionName.isNotEmpty()) {
             tvAlbumValue.text = track.collectionName
             tvAlbumGroup.visibility = View.VISIBLE
         } else tvAlbumGroup.visibility = View.GONE
 
         //Show year
-        if (!track.releaseDate.isNullOrEmpty()) {
+        if (track.releaseDate.isNotEmpty()) {
             tvYearValue.text = track.releaseDate.split("-").first()
             tvYearGroup.visibility = View.VISIBLE
         } else tvYearGroup.visibility = View.GONE
@@ -101,12 +107,14 @@ class PlayerActivity : AppCompatActivity() {
 
         //Play/pause track
         buttonPlay.setOnClickListener {
-            if (trackIsPlay) {
-                buttonPlay.setImageResource(R.drawable.ic_button_play)
-                trackIsPlay = false
-            } else {
-                buttonPlay.setImageResource(R.drawable.ic_button_pause)
-                trackIsPlay = true
+            when (mediaPlayerHelper.state) {
+                STATE_PLAYING -> {
+                    pausePlayer()
+                }
+
+                STATE_PREPARED, STATE_PAUSED -> {
+                    startPlayer()
+                }
             }
         }
 
@@ -120,5 +128,48 @@ class PlayerActivity : AppCompatActivity() {
                 trackIsHasPlaylist = true
             }
         }
+
+        //Listener for timer
+        mediaPlayerHelper.setOnTimerTickListener(object : MediaPlayerHelper.OnTimerTickListener {
+            override fun onTimerTick(formattedTime: String) {
+                tvTimer.text = formattedTime
+            }
+        })
+
+        // Set button play when track is completed
+        mediaPlayerHelper.setOnPlaybackStateChangedListener(object :
+            MediaPlayerHelper.OnPlaybackStateChangedListener {
+            override fun onPlaybackCompleted() {
+                runOnUiThread {
+                    buttonPlay.setImageResource(R.drawable.ic_button_play) // ← ставим иконку play
+                }
+            }
+        })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayerHelper.release()
+    }
+
+    private fun prepareMediaPlayer() {
+        mediaPlayerHelper.prepare()
+        buttonPlay.setImageResource(R.drawable.ic_button_play)
+        tvTimer.text = Converter.mmToSs(0)
+    }
+
+    private fun startPlayer() {
+        mediaPlayerHelper.start()
+        buttonPlay.setImageResource(R.drawable.ic_button_pause)
+    }
+
+    private fun pausePlayer() {
+        mediaPlayerHelper.pause()
+        buttonPlay.setImageResource(R.drawable.ic_button_play)
     }
 }

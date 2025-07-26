@@ -6,13 +6,13 @@
     <!--Main-->
     <color name="text_color_title_main_screen">@color/yp_white</color>
     <color name="text_color_main_screen">@color/yp_black</color>
-    <color name="background_main_screen">#3772E7</color>
+    <color name="background_main_screen">@color/yp_blue</color>
     <!--Settings-->
     <color name="background_setting_screen">@color/yp_white</color>
     <color name="icon_color_main_screen">@color/yp_black</color>
     <color name="icon_color_setting_screen">@color/yp_gray</color>
     <color name="icon_knob_off_setting_screen">@color/yp_gray</color>
-    <color name="icon_knob_on_setting_screen">#3772E7</color>
+    <color name="icon_knob_on_setting_screen">@color/yp_blue</color>
     <color name="icon_track_off_setting_screen">#E6E8EB</color>
     <color name="icon_track_on_setting_screen">#9FBBF3</color>
 
@@ -34,4 +34,5 @@
     <color name="yp_light_gray">#E6E8EB</color>
     <color name="yp_black">#1A1B22</color>
     <color name="yp_red">#F56B6C</color>
+    <color name="yp_blue">#3772E7</color>
 </resources>
