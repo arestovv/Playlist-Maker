@@ -1,0 +1,11 @@
+package com.arestov.playlistmaker.data.network
+
+import com.arestov.playlistmaker.data.model.TracksResponse
+import retrofit2.Call
+import retrofit2.http.GET
+import retrofit2.http.Query
+
+interface RetrofitApi {
+    @GET("/search?entity=song")
+    fun search(@Query("term") text: String): Call<TracksResponse>
+}

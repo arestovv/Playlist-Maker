@@ -1,8 +1,10 @@
-package com.arestov.playlistmaker.search
+package com.arestov.playlistmaker.ui.search
 
-import android.content.Context
+import GetTrackHistoryUseCase
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -18,21 +20,20 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.arestov.playlistmaker.PLAYLIST_MAKER_PREFERENCES
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.search.itunes.ITunesClientApi
-import com.arestov.playlistmaker.search.track.Track
-import com.arestov.playlistmaker.search.track.TrackAdapter
+import com.arestov.playlistmaker.creator.Creator
+import com.arestov.playlistmaker.creator.Creator.provideGetTrackHistoryUseCase
+import com.arestov.playlistmaker.domain.model.Track
+import com.arestov.playlistmaker.domain.consumer.Consumer
+import com.arestov.playlistmaker.domain.consumer.ConsumerData
+import com.arestov.playlistmaker.ui.main.sharedPrefs
 import com.arestov.playlistmaker.utils.Debounce
 import com.arestov.playlistmaker.utils.ScreensHolder
-import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
-    companion object {
-        const val SEARCH_TEXT = "SEARCH_TEXT"
-    }
 
+    val handler = Handler(Looper.getMainLooper())
     private var text = ""
     private lateinit var trackRecyclerView: RecyclerView
     private lateinit var inputEditText: EditText
@@ -44,8 +45,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var infoContainerButton: Button
     private lateinit var progressBar: ProgressBar
 
-    private lateinit var sharedPrefs: SharedPreferences
-    private lateinit var trackHistoryHolder: TrackHistoryHolder
+    private lateinit var trackHistoryHolder: GetTrackHistoryUseCase
     private lateinit var historyContainer: LinearLayout
     private lateinit var historyRecyclerView: RecyclerView
     private lateinit var clearHistoryButton: Button
@@ -54,20 +54,20 @@ class SearchActivity : AppCompatActivity() {
     private var tracks = ArrayList<Track>()
     private lateinit var trackAdapter: TrackAdapter
 
+    private val getTrackListUseCase = Creator.provideGetTrackListUseCase()
+
     //Thread for showing the result while typing
-    private val requestToITunesRunnable = Runnable { requestToITunes() }
+    private val getTracksByTapping = Runnable { getTracks() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         //KeyBoard state
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
         //RecyclerView for history tracks
-        trackHistoryHolder = TrackHistoryHolder(sharedPrefs)
+        trackHistoryHolder = provideGetTrackHistoryUseCase(sharedPrefs)
         historyRecyclerView = findViewById(R.id.historyRecyclerView)
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
         clearHistoryButton = findViewById(R.id.history_clear_button)
@@ -77,7 +77,7 @@ class SearchActivity : AppCompatActivity() {
             if (Debounce.isClickAllowed()) {
                 trackHistoryHolder.addTrack(track)
                 //Open Player screen
-                ScreensHolder.launch(PLAYER, this)
+                ScreensHolder.Companion.launch(ScreensHolder.Screens.PLAYER, this)
             }
         }
         historyRecyclerView.adapter = tracksHistoryAdapter
@@ -91,7 +91,7 @@ class SearchActivity : AppCompatActivity() {
             if (Debounce.isClickAllowed()) {
                 trackHistoryHolder.addTrack(track)
                 //Open Player screen
-                ScreensHolder.launch(PLAYER, this)
+                ScreensHolder.Companion.launch(ScreensHolder.Screens.PLAYER, this)
             }
         }
         trackRecyclerView.adapter = trackAdapter
@@ -132,7 +132,7 @@ class SearchActivity : AppCompatActivity() {
 
         //update button
         infoContainerButton.setOnClickListener {
-            requestToITunes()
+            getTracks()
         }
 
         //Set focus to input when open view
@@ -154,7 +154,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         inputEditText.doOnTextChanged { text, _, _, _ ->
-            Debounce.searchDebounce(requestToITunesRunnable)
+            Debounce.searchDebounce(getTracksByTapping)
             //Show button clear if input has text
             clearButton.isVisible = !text.isNullOrEmpty()
             //Hide track content when input empty
@@ -180,17 +180,39 @@ class SearchActivity : AppCompatActivity() {
         updateHistoryAdapter()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        Debounce.removeCallbacks(getTracksByTapping)
+    }
+
     //fun for get data from itunes api
-    private fun requestToITunes() {
+    private fun getTracks() {
         val searchText = inputEditText.text.toString()
+
         if (searchText.isNotEmpty()) {
             //show progress bar
             showProgressBar()
-            ITunesClientApi().searchTracks(
+            getTrackListUseCase.execute(
                 text = searchText,
-                onSuccess = { showTracks(it) },
-                onEmpty = { showNothingFound() },
-                onError = { showNetworkProblem() }
+                consumer = object : Consumer<List<Track>> {
+
+                    override fun consume(data: ConsumerData<List<Track>>) {
+                        handler.post {
+                            when (data) {
+                                is ConsumerData.Error -> {
+                                    showNetworkProblem()
+                                }
+
+                                is ConsumerData.Data ->
+                                    if (data.data.isEmpty()) {
+                                        showNothingFound()
+                                    } else {
+                                        showTracks(data.data)
+                                    }
+                            }
+                        }
+                    }
+                }
             )
         }
     }
@@ -284,6 +306,10 @@ class SearchActivity : AppCompatActivity() {
         text = savedInstanceState.getString(SEARCH_TEXT, "")
         inputEditText.setText(text)
         clearButton.isVisible = !inputEditText.text.isNullOrEmpty()
-        requestToITunes()
+        getTracks()
+    }
+
+    companion object {
+        const val SEARCH_TEXT = "SEARCH_TEXT"
     }
 }

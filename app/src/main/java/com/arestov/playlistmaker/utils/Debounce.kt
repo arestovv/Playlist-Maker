@@ -22,4 +22,8 @@ object Debounce {
         handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
+
+    fun removeCallbacks(searchRunnable: Runnable) {
+        handler.removeCallbacks(searchRunnable)
+    }
 }

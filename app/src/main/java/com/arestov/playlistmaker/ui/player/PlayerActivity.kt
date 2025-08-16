@@ -1,41 +1,33 @@
-package com.arestov.playlistmaker.player
+package com.arestov.playlistmaker.ui.player
 
-import android.content.SharedPreferences
+import GetTrackHistoryUseCase
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.Group
-import com.arestov.playlistmaker.PLAYLIST_MAKER_PREFERENCES
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.player.MediaPlayerHelper.Companion.STATE_PAUSED
-import com.arestov.playlistmaker.player.MediaPlayerHelper.Companion.STATE_PLAYING
-import com.arestov.playlistmaker.player.MediaPlayerHelper.Companion.STATE_PREPARED
-import com.arestov.playlistmaker.search.TrackHistoryHolder
+import com.arestov.playlistmaker.creator.Creator
+import com.arestov.playlistmaker.presentation.MediaPlayerHelper
+import com.arestov.playlistmaker.ui.main.sharedPrefs
 import com.arestov.playlistmaker.utils.Converter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.appbar.MaterialToolbar
 
-
-private lateinit var historyHolder: TrackHistoryHolder
-lateinit var sharedPrefs: SharedPreferences
-lateinit var mediaPlayerHelper: MediaPlayerHelper
-
 class PlayerActivity : AppCompatActivity() {
-
+    private lateinit var historyHolder: GetTrackHistoryUseCase
+    lateinit var mediaPlayerHelper: MediaPlayerHelper
     private lateinit var buttonPlay: ImageView
     private lateinit var tvTimer: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
-
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        historyHolder = TrackHistoryHolder(sharedPrefs)
         //Get selected track
-        val track = historyHolder.getFirstTrack()
+        historyHolder = Creator.provideGetTrackHistoryUseCase(sharedPrefs)
+        val track = historyHolder.getTracks().first()
         mediaPlayerHelper = MediaPlayerHelper(track)
 
         //mock for add track favorite
@@ -68,15 +60,15 @@ class PlayerActivity : AppCompatActivity() {
 
         //Set image album
         Glide.with(imageAlbum)
-            .load(track.getArtworkUrl512())
+            .load(track.artworkUrl512)
             .placeholder(R.drawable.im_album_placeholder)
-            .transform(RoundedCorners(Converter.dpToPx(8f, this)))
+            .transform(RoundedCorners(Converter.Companion.dpToPx(8f, this)))
             .into(imageAlbum)
 
-        tvTimer.text = Converter.mmToSs(0)
+        tvTimer.text = Converter.Companion.mmToSs(0)
         tvTrackName.text = track.trackName
         tvArtistName.text = track.artistName
-        tvDurationValue.text = Converter.mmToSs(track.trackTimeMillis)
+        tvDurationValue.text = track.trackTimeSeconds
         tvGenre.text = track.primaryGenreName
         tvCountry.text = track.country
 
@@ -89,8 +81,8 @@ class PlayerActivity : AppCompatActivity() {
         } else tvAlbumGroup.visibility = View.GONE
 
         //Show year
-        if (track.releaseDate.isNotEmpty()) {
-            tvYearValue.text = track.releaseDate.split("-").first()
+        if (track.releaseYear.isNotEmpty()) {
+            tvYearValue.text = track.releaseYear
             tvYearGroup.visibility = View.VISIBLE
         } else tvYearGroup.visibility = View.GONE
 
@@ -107,14 +99,10 @@ class PlayerActivity : AppCompatActivity() {
 
         //Play/pause track
         buttonPlay.setOnClickListener {
-            when (mediaPlayerHelper.state) {
-                STATE_PLAYING -> {
-                    pausePlayer()
-                }
-
-                STATE_PREPARED, STATE_PAUSED -> {
-                    startPlayer()
-                }
+            if (mediaPlayerHelper.isPlaying()) {
+                pausePlayer()
+            } else {
+                startPlayer()
             }
         }
 
@@ -160,7 +148,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun prepareMediaPlayer() {
         mediaPlayerHelper.prepare()
         buttonPlay.setImageResource(R.drawable.ic_button_play)
-        tvTimer.text = Converter.mmToSs(0)
+        tvTimer.text = Converter.Companion.mmToSs(0)
     }
 
     private fun startPlayer() {

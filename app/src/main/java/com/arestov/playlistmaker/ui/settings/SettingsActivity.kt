@@ -1,29 +1,30 @@
-package com.arestov.playlistmaker.settings
+package com.arestov.playlistmaker.ui.settings
 
+import GetPreferencesStorageUseCase
 import android.content.Intent
-import android.content.SharedPreferences
-import android.os.Bundle
 import android.net.Uri
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
-import com.arestov.playlistmaker.app.App
-import com.arestov.playlistmaker.PLAYLIST_MAKER_PREFERENCES
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.SWITCHER_DARK_THEME_STATE_KEY
-import com.arestov.playlistmaker.utils.ScreensHolder
-import com.arestov.playlistmaker.utils.ScreensHolder.Screens.SETTINGS
+import com.arestov.playlistmaker.ui.main.SWITCHER_DARK_THEME_STATE_KEY
+import com.arestov.playlistmaker.app.App
+import com.arestov.playlistmaker.creator.Creator
+import com.arestov.playlistmaker.ui.main.sharedPrefs
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
-lateinit var sharedPrefs: SharedPreferences
-
 class SettingsActivity : AppCompatActivity() {
+    lateinit var preferencesStorage: GetPreferencesStorageUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+
+        preferencesStorage = Creator.provideGetPreferencesStorageUseCase(
+            SWITCHER_DARK_THEME_STATE_KEY, sharedPrefs
+        )
 
         //Back
         val back = findViewById<MaterialToolbar>(R.id.toolbar_settings_screen)
@@ -34,7 +35,7 @@ class SettingsActivity : AppCompatActivity() {
         //Switch theme
         val switcherTheme = findViewById<SwitchMaterial>(R.id.switcher_theme)
         //Set switcher state from file preferences
-        switcherTheme.isChecked = sharedPrefs.getBoolean(SWITCHER_DARK_THEME_STATE_KEY, false)
+        switcherTheme.isChecked = preferencesStorage.getBoolean(false)
         //Switch listener
         switcherTheme.setOnCheckedChangeListener { switcher, checked ->
             //Save switcher state to file preferences
@@ -67,7 +68,7 @@ class SettingsActivity : AppCompatActivity() {
         val buttonAgreement = findViewById<MaterialTextView>(R.id.button_agreement)
         buttonAgreement.setOnClickListener {
             val url = getString(R.string.agreement_url)
-            val agreementIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            val agreementIntent = Intent(Intent.ACTION_VIEW, url.toUri())
             startActivity(agreementIntent)
         }
     }

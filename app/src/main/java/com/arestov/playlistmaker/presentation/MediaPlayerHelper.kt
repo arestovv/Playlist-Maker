@@ -1,19 +1,12 @@
-package com.arestov.playlistmaker.player
+package com.arestov.playlistmaker.presentation
 
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
-import com.arestov.playlistmaker.search.track.Track
+import com.arestov.playlistmaker.domain.model.Track
 import com.arestov.playlistmaker.utils.Converter
 
 class MediaPlayerHelper(private val track: Track) {
-
-    companion object {
-        const val STATE_DEFAULT = 0
-        const val STATE_PREPARED = 1
-        const val STATE_PLAYING = 2
-        const val STATE_PAUSED = 3
-    }
 
     private var playbackStateListener: OnPlaybackStateChangedListener? = null
     private var timerTickListener: OnTimerTickListener? = null
@@ -21,7 +14,8 @@ class MediaPlayerHelper(private val track: Track) {
     private val updateTimerRunnable = Runnable { updateTimer() }
 
     private var mediaPlayer = MediaPlayer()
-    var state = STATE_DEFAULT
+    private var state = STATE_DEFAULT
+    private var delay = 400L
 
     fun prepare() {
         mediaPlayer.setDataSource(track.previewUrl)
@@ -35,7 +29,7 @@ class MediaPlayerHelper(private val track: Track) {
             // Callback track is completed
             playbackStateListener?.onPlaybackCompleted()
             // Reset timer
-            timerTickListener?.onTimerTick(Converter.mmToSs(0))
+            timerTickListener?.onTimerTick(Converter.Companion.mmToSs(0))
             // Reset track
             mediaPlayer.seekTo(0)
         }
@@ -52,6 +46,10 @@ class MediaPlayerHelper(private val track: Track) {
         state = STATE_PAUSED
     }
 
+    fun isPlaying(): Boolean {
+        return state == STATE_PLAYING
+    }
+
     fun release() {
         mediaPlayer.release()
         handler.removeCallbacks(updateTimerRunnable);
@@ -64,10 +62,10 @@ class MediaPlayerHelper(private val track: Track) {
     private fun updateTimer() {
         if (mediaPlayer.isPlaying) {
             val positionMs = mediaPlayer.currentPosition
-            val timerText = Converter.mmToSs(positionMs.toLong())
+            val timerText = Converter.Companion.mmToSs(positionMs.toLong())
             timerTickListener?.onTimerTick(timerText)
         }
-        handler.postDelayed(updateTimerRunnable, 400)
+        handler.postDelayed(updateTimerRunnable, delay)
     }
 
     fun setOnTimerTickListener(listener: OnTimerTickListener) {
@@ -84,5 +82,12 @@ class MediaPlayerHelper(private val track: Track) {
 
     interface OnTimerTickListener {
         fun onTimerTick(formattedTime: String)
+    }
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
     }
 }
