@@ -1,7 +1,8 @@
-package com.arestov.playlistmaker.search.track
+package com.arestov.playlistmaker.ui.search
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.arestov.playlistmaker.domain.model.Track
 
 class TrackAdapter(
     private val data: List<Track>,

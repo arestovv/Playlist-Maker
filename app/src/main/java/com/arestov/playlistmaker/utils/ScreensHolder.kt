@@ -2,11 +2,11 @@ package com.arestov.playlistmaker.utils
 
 import android.content.Context
 import android.content.Intent
-import com.arestov.playlistmaker.MainActivity
-import com.arestov.playlistmaker.media.MediaActivity
-import com.arestov.playlistmaker.player.PlayerActivity
-import com.arestov.playlistmaker.search.SearchActivity
-import com.arestov.playlistmaker.settings.SettingsActivity
+import com.arestov.playlistmaker.ui.main.MainActivity
+import com.arestov.playlistmaker.ui.media.MediaActivity
+import com.arestov.playlistmaker.ui.player.PlayerActivity
+import com.arestov.playlistmaker.ui.search.SearchActivity
+import com.arestov.playlistmaker.ui.settings.SettingsActivity
 import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 
 class ScreensHolder {

@@ -1,4 +1,4 @@
-package com.arestov.playlistmaker.media
+package com.arestov.playlistmaker.ui.media
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

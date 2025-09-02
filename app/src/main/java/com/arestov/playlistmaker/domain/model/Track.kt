@@ -1,22 +1,18 @@
-package com.arestov.playlistmaker.search.track
+package com.arestov.playlistmaker.domain.model
 
 data class Track(
     val trackId: Long,
     val trackName: String,
     val artistName: String,
-    val trackTimeMillis: Long,
+    val trackTimeSeconds: String,
     val artworkUrl100: String,
+    val artworkUrl512: String,
     val collectionName: String,
-    val releaseDate: String,
+    val releaseYear: String,
     val primaryGenreName: String,
     val country: String,
     val previewUrl: String
 ) {
-
-    //Get image better quality
-    fun getArtworkUrl512(): String {
-        return artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
-    }
 
     override fun equals(other: Any?): Boolean {
         return other is Track && this.trackId == other.trackId
@@ -26,4 +22,3 @@ data class Track(
         return trackId.hashCode()
     }
 }
-

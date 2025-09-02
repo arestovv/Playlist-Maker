@@ -1,9 +1,10 @@
-package com.arestov.playlistmaker
+package com.arestov.playlistmaker.ui.main
 
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.app.App
 import com.arestov.playlistmaker.utils.ScreensHolder
 import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
