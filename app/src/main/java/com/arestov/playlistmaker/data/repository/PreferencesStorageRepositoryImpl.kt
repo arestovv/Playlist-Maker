@@ -41,7 +41,7 @@ class PreferencesStorageRepositoryImpl(
         sharedPreferences.edit { clear() }
     }
 
-    override fun contains(key: String): Boolean {
+    override fun contains(): Boolean {
         return sharedPreferences.contains(key)
     }
 }

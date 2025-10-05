@@ -1,6 +1,6 @@
 package com.arestov.playlistmaker.ui.search
 
-import GetTrackHistoryUseCase
+import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -44,7 +44,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var infoContainerButton: Button
     private lateinit var progressBar: ProgressBar
 
-    private lateinit var trackHistoryHolder: GetTrackHistoryUseCase
+    private lateinit var trackHistoryHolder: GetTrackHistoryInteractor
     private lateinit var historyContainer: LinearLayout
     private lateinit var historyRecyclerView: RecyclerView
     private lateinit var clearHistoryButton: Button

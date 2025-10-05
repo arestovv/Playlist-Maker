@@ -9,5 +9,5 @@ interface PreferencesStorageRepository {
     fun getBoolean(defaultValue: Boolean = false): Boolean
     fun remove()
     fun clear()
-    fun contains(key: String): Boolean
+    fun contains(): Boolean
 }

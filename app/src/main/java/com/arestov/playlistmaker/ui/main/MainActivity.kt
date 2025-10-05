@@ -5,9 +5,10 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.app.App
+import com.arestov.playlistmaker.creator.Creator
 import com.arestov.playlistmaker.utils.ScreensHolder
 import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
+import com.arestov.playlistmaker.utils.ThemeManager
 
 const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
 const val SWITCHER_DARK_THEME_STATE_KEY = "switcher_dark_theme_state_key"
@@ -20,9 +21,16 @@ class MainActivity : AppCompatActivity() {
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
 
         //Restore choose theme from file preferences
+        val themeRepository = Creator.provideThemeRepository(
+            key = SWITCHER_DARK_THEME_STATE_KEY,
+            sharedPref = sharedPrefs
+        )
         //Set theme
-        val isDark = (applicationContext as App).getTheme(sharedPrefs)
-        (applicationContext as App).setTheme(isDark, sharedPrefs)
+        if (!themeRepository.hasThemePreference()) {
+            val state = ThemeManager.isSystemDarkThemeEnabled(this)
+            themeRepository.setDarkThemeEnabled(state)
+        }
+        ThemeManager.applyDarkTheme(themeRepository.isAppDarkThemeEnabled())
 
         //Set main activity
         setContentView(R.layout.activity_main)
