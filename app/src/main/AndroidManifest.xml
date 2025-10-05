@@ -16,7 +16,7 @@
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
         tools:targetApi="31" >
         <activity
-            android:name=".mvvm.main.ui.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,16 +26,16 @@
         </activity>
 
         <activity
-            android:name=".mvvm.media.ui.MediaActivity"
+            android:name=".ui.media.MediaActivity"
             android:exported="false" />
         <activity
-            android:name=".mvvm.search.ui.SearchActivity"
+            android:name=".ui.search.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".mvvm.settings.ui.SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".mvvm.player.ui.PlayerActivity"
+            android:name=".ui.player.PlayerActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false" />
     </application>
