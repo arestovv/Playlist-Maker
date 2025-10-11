@@ -13,9 +13,9 @@ object TrackMapper {
             artistName = dto.artistName,
             trackTimeSeconds = Converter.Companion.mmToSs(dto.trackTimeMillis),
             artworkUrl100 = dto.artworkUrl100,
-            artworkUrl512 = dto.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg"),
+            artworkUrl512 = dto.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"),
             collectionName = dto.collectionName,
-            releaseYear = dto.releaseDate.split("-").first(),
+            releaseYear = dto.releaseDate?.split("-")?.firstOrNull() ?: "",
             primaryGenreName = dto.primaryGenreName,
             country = dto.country,
             previewUrl = dto.previewUrl

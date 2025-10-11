@@ -1,0 +1,39 @@
+package com.arestov.playlistmaker.data.repository
+
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.core.net.toUri
+import com.arestov.playlistmaker.R
+import com.arestov.playlistmaker.domain.repository.ExternalNavigatorRepository
+import com.arestov.playlistmaker.domain.settings.model.EmailData
+
+class ExternalNavigatorRepositoryImpl(private val context: Context) : ExternalNavigatorRepository {
+
+    override fun shareApp(shareAppLink: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareAppLink)
+        }
+        context.startActivity(
+            Intent.createChooser(
+                intent,
+                context.getString(R.string.share_info_message)
+            )
+        )
+    }
+
+    override fun openSupport(supportEmailData: EmailData) {
+        val mailto = "mailto:${supportEmailData.email}" +
+                "?subject=${Uri.encode(supportEmailData.subject)}" +
+                "&body=${Uri.encode(supportEmailData.body)}"
+
+        val intent = Intent(Intent.ACTION_SENDTO, mailto.toUri())
+        context.startActivity(intent)
+    }
+
+    override fun openTerms(termsLink: String) {
+        val intent = Intent(Intent.ACTION_VIEW, termsLink.toUri())
+        context.startActivity(intent)
+    }
+}

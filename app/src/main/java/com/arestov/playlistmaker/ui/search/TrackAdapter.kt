@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arestov.playlistmaker.domain.search.model.Track
 
 class TrackAdapter(
-    private val data: List<Track>,
+    private var data: List<Track>,
     private val onItemClick: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
@@ -25,5 +25,10 @@ class TrackAdapter(
 
     override fun getItemCount(): Int {
         return data.size
+    }
+
+    fun updateData(newTracks: List<Track>) {
+        data = newTracks
+        notifyDataSetChanged()
     }
 }

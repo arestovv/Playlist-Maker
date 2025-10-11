@@ -5,15 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.arestov.playlistmaker.creator.Creator
 import com.arestov.playlistmaker.databinding.ActivitySettingsBinding
-import com.arestov.playlistmaker.domain.settings.ExternalNavigator
-import com.arestov.playlistmaker.domain.settings.impl.SharingInteractorImpl
 import com.arestov.playlistmaker.utils.ThemeManager
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var viewModel: SettingsViewModel
-    val navigator = ExternalNavigator(this)
-    val sharingInteractor = SharingInteractorImpl(navigator, this)
     private lateinit var binding: ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +19,7 @@ class SettingsActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(
             this,
-            Creator.provideSettingsViewModelFactory(sharingInteractor)
+            Creator.provideSettingsViewModelFactory(context = this)
         ).get(SettingsViewModel::class.java)
 
         //Back
@@ -34,7 +30,7 @@ class SettingsActivity : AppCompatActivity() {
         //Switch theme
         viewModel.themeStateLiveData.observe(this) { state ->
             binding.switcherTheme.isChecked = state
-            ThemeManager.applyDarkTheme(enabled = state)
+            ThemeManager.setDarkMode(state = state)
         }
 
         binding.switcherTheme.setOnCheckedChangeListener { switcher, checked ->

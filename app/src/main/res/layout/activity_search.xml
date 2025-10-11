@@ -40,7 +40,7 @@
 
         <!-- Search input  -->
         <EditText
-            android:id="@+id/search_view_search_screen"
+            android:id="@+id/input_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -59,11 +59,13 @@
             android:textColorHint="@color/color_edit_search_screen"
             android:textCursorDrawable="@color/yp_black"
             android:textSize="16sp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             />
 
         <!--  Clean button      -->
         <ImageView
-            android:id="@+id/clear_icon_search_view"
+            android:id="@+id/button_clear_input_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center"
@@ -86,7 +88,7 @@
 
     <!-- Tracks RecyclerView    -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/trackRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingVertical="24dp"
@@ -167,7 +169,7 @@
 
         <!-- Button clear history   -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/history_clear_button"
+            android:id="@+id/button_clear_history"
             style="@style/SearchScreenButtons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -1,14 +1,13 @@
 package com.arestov.playlistmaker.data.search.repository
 
-import android.content.SharedPreferences
-import com.arestov.playlistmaker.data.repository.PreferencesStorageRepositoryImpl
+import com.arestov.playlistmaker.domain.repository.PreferencesStorageRepository
 import com.arestov.playlistmaker.domain.search.model.Track
 import com.arestov.playlistmaker.domain.search.repository.TrackHistoryRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class TrackHistoryRepositoryImpl(sharedPreferences: SharedPreferences) : TrackHistoryRepository {
-    private val storage = PreferencesStorageRepositoryImpl(TRACK_HISTORY_KEY, sharedPreferences)
+class TrackHistoryRepositoryImpl(private val storage: PreferencesStorageRepository) :
+    TrackHistoryRepository {
     private var listTracks = ArrayList<Track>()
 
     //Get list track from Prefs
@@ -61,9 +60,5 @@ class TrackHistoryRepositoryImpl(sharedPreferences: SharedPreferences) : TrackHi
     //Clear list tracks from SharedPreferences
     private fun clearListFromPref() {
         storage.clear()
-    }
-
-    companion object {
-        const val TRACK_HISTORY_KEY = "track_history"
     }
 }

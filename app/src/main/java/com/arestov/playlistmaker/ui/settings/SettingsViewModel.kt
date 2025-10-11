@@ -2,38 +2,52 @@ package com.arestov.playlistmaker.ui.settings
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.arestov.playlistmaker.creator.Creator
-import com.arestov.playlistmaker.domain.settings.SharingInteractor
-import com.arestov.playlistmaker.ui.main.SWITCHER_DARK_THEME_STATE_KEY
-import com.arestov.playlistmaker.ui.main.sharedPrefs
+import com.arestov.playlistmaker.R
+import com.arestov.playlistmaker.domain.repository.ExternalNavigatorRepository
+import com.arestov.playlistmaker.domain.repository.ThemeRepository
+import com.arestov.playlistmaker.domain.settings.model.EmailData
+import com.arestov.playlistmaker.utils.ResourceManager
 
 class SettingsViewModel(
-    private val sharingInteractor: SharingInteractor
+    private val externalNavigatorRepository: ExternalNavigatorRepository,
+    private val themeRepository: ThemeRepository,
+    private val resourceManager: ResourceManager,
 ) : ViewModel() {
 
-    val themeRepository = Creator.provideThemeRepository(
-        key = SWITCHER_DARK_THEME_STATE_KEY,
-        sharedPref = sharedPrefs
-    )
-    private val themeStateMutableLiveData = MutableLiveData<Boolean>().apply {
-        value = themeRepository.isAppDarkThemeEnabled()
-    }
-    val themeStateLiveData = themeStateMutableLiveData;
-
-    fun setDarkThemeEnabled(state: Boolean) {
-        themeRepository.setDarkThemeEnabled(state)
-        themeStateMutableLiveData.value = state
+    val themeStateLiveData = MutableLiveData<Boolean>().apply {
+        value = themeRepository.isDarkThemeEnabled()
     }
 
-    fun shareApp(){
-        sharingInteractor.shareApp()
+    fun setDarkThemeEnabled(enabled: Boolean) {
+        themeRepository.setDarkThemeEnabled(enabled)
+        themeStateLiveData.value = enabled
     }
 
-    fun openTerms(){
-        sharingInteractor.openTerms()
+    fun shareApp() {
+        externalNavigatorRepository.shareApp(shareAppLink = getShareAppLink())
     }
 
-    fun openSupport(){
-        sharingInteractor.openSupport()
+    fun openTerms() {
+        externalNavigatorRepository.openTerms(termsLink = getTermsLink())
     }
+
+    fun openSupport() {
+        externalNavigatorRepository.openSupport(supportEmailData = getSupportEmailData())
+    }
+
+    private fun getShareAppLink(): String {
+        return resourceManager.getString(R.string.share_message)
+    }
+
+    private fun getSupportEmailData(): EmailData {
+        val email = resourceManager.getString(R.string.email)
+        val subject = resourceManager.getString(R.string.email_subject)
+        val body = resourceManager.getString(R.string.email_body)
+        return EmailData(email, subject, body)
+    }
+
+    private fun getTermsLink(): String {
+        return resourceManager.getString(R.string.agreement_url)
+    }
+
 }

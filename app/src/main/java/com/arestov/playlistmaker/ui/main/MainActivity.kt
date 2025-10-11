@@ -2,56 +2,53 @@ package com.arestov.playlistmaker.ui.main
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.arestov.playlistmaker.R
+import androidx.lifecycle.ViewModelProvider
 import com.arestov.playlistmaker.creator.Creator
+import com.arestov.playlistmaker.databinding.ActivityMainBinding
 import com.arestov.playlistmaker.utils.ScreensHolder
 import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
 import com.arestov.playlistmaker.utils.ThemeManager
 
 const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
 const val SWITCHER_DARK_THEME_STATE_KEY = "switcher_dark_theme_state_key"
+const val TRACK_HISTORY_KEY = "track_history"
 lateinit var sharedPrefs: SharedPreferences
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var viewModel: MainViewModel
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+        setContentView(binding.root)
 
-        //Restore choose theme from file preferences
-        val themeRepository = Creator.provideThemeRepository(
-            key = SWITCHER_DARK_THEME_STATE_KEY,
-            sharedPref = sharedPrefs
-        )
-        //Set theme
-        if (!themeRepository.hasThemePreference()) {
-            val state = ThemeManager.isSystemDarkThemeEnabled(this)
-            themeRepository.setDarkThemeEnabled(state)
-        }
-        ThemeManager.applyDarkTheme(themeRepository.isAppDarkThemeEnabled())
+        viewModel = ViewModelProvider(
+            owner = this,
+            factory = Creator.provideMainViewModelFactory(
+                context = this,
+                sharedPreferences = sharedPrefs
+            )
+        ).get(MainViewModel::class.java)
 
-        //Set main activity
-        setContentView(R.layout.activity_main)
-
-        val buttonSearch = findViewById<Button>(R.id.button_search)
-        val buttonMedia = findViewById<Button>(R.id.button_media)
-        val buttonSettings = findViewById<Button>(R.id.button_setting)
+        ThemeManager.setDarkMode(viewModel.getStateDarkMode())
 
         //Search clickListener
-        buttonSearch.setOnClickListener {
-            ScreensHolder.launch(SEARCH, this)
+        binding.buttonSearch.setOnClickListener {
+            ScreensHolder.launch(screen = SEARCH, context = this)
         }
 
         //Media clickListener
-        buttonMedia.setOnClickListener {
-            ScreensHolder.launch(MEDIA, this)
+        binding.buttonMedia.setOnClickListener {
+            ScreensHolder.launch(screen = MEDIA, context = this)
         }
 
         //Settings clickListener
-        buttonSettings.setOnClickListener {
-            ScreensHolder.launch(SETTINGS, this)
+        binding.buttonSetting.setOnClickListener {
+            ScreensHolder.launch(screen = SETTINGS, context = this)
         }
     }
 

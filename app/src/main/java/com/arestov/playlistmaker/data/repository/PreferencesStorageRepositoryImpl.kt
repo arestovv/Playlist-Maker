@@ -7,7 +7,7 @@ import com.arestov.playlistmaker.domain.repository.PreferencesStorageRepository
 class PreferencesStorageRepositoryImpl(
     private val key: String,
     private val sharedPreferences: SharedPreferences
-): PreferencesStorageRepository {
+) : PreferencesStorageRepository {
 
     override fun putString(value: String) {
         sharedPreferences.edit { putString(key, value) }

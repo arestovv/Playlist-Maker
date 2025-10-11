@@ -1,19 +1,35 @@
 package com.arestov.playlistmaker.data.repository
 
+import com.arestov.playlistmaker.domain.provider.SystemThemeProvider
 import com.arestov.playlistmaker.domain.repository.PreferencesStorageRepository
 import com.arestov.playlistmaker.domain.repository.ThemeRepository
 
-class ThemeRepositoryImpl(val storage: PreferencesStorageRepository) : ThemeRepository {
+class ThemeRepositoryImpl(
+    private val storage: PreferencesStorageRepository,
+    private val systemThemeProvider: SystemThemeProvider
+) : ThemeRepository {
 
-    override fun isAppDarkThemeEnabled(): Boolean {
+    fun isAppDarkThemeEnabled(): Boolean {
         return storage.getBoolean()
     }
 
-    override fun setDarkThemeEnabled(enabled: Boolean) {
-        storage.putBoolean(enabled)
+    fun isThemeSet(): Boolean {
+        return storage.contains()
     }
 
-    override fun hasThemePreference(): Boolean {
-        return storage.contains()
+    fun isSystemDarkThemeEnabled(): Boolean {
+        return systemThemeProvider.isSystemDarkThemeEnabled()
+    }
+
+    override fun setDarkThemeEnabled(state: Boolean) {
+        storage.putBoolean(state)
+    }
+
+    override fun isDarkThemeEnabled(): Boolean {
+        if (!isThemeSet()) {
+            val initialTheme = isSystemDarkThemeEnabled();
+            setDarkThemeEnabled(initialTheme)
+        }
+        return isAppDarkThemeEnabled()
     }
 }

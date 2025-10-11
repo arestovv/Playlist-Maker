@@ -1,6 +1,5 @@
 package com.arestov.playlistmaker.ui.player
 
-import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -9,13 +8,11 @@ import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.creator.Creator
 import com.arestov.playlistmaker.databinding.ActivityPlayerBinding
 import com.arestov.playlistmaker.domain.search.model.Track
-import com.arestov.playlistmaker.ui.main.sharedPrefs
 import com.arestov.playlistmaker.utils.Converter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 class PlayerActivity : AppCompatActivity() {
-    private lateinit var historyHolder: GetTrackHistoryInteractor
     private lateinit var viewModel: PlayerViewModel
     private lateinit var binding: ActivityPlayerBinding
 
@@ -24,21 +21,19 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //Get selected track
-        historyHolder = Creator.provideGetTrackHistoryUseCase(sharedPrefs)
-        val track = historyHolder.getTracks().first()
-
         viewModel = ViewModelProvider(
             this,
-            Creator.providePlayerViewModelFactory(track.previewUrl)
+            Creator.providePlayerViewModelFactory()
         ).get(PlayerViewModel::class.java)
 
+        val track = viewModel.getTrack()
+
         //Слушатель состояние плеера
-        viewModel.screenStateLiveData.observe(this) { state ->
+        viewModel.playerStateLiveData.observe(this) { state ->
             //Обновление таймера
             binding.textTimer.text = state.progress
             //Получаем состояние плеера (Playing = true, else false)
-            val isPlaying = state is PlayerViewModel.ScreenState.Playing
+            val isPlaying = state is PlayerState.Playing
             //Смена иконки кнопки Play/Pause
             changeButtonState(isPlaying = isPlaying)
         }
