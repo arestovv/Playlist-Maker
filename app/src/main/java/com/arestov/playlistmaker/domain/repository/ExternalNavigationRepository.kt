@@ -1,8 +1,8 @@
 package com.arestov.playlistmaker.domain.repository
 
-import com.arestov.playlistmaker.domain.settings.model.EmailData
+import com.arestov.playlistmaker.domain.model.EmailData
 
-interface ExternalNavigatorRepository  {
+interface ExternalNavigationRepository  {
     fun shareApp(shareAppLink: String)
     fun openTerms(termsLink: String)
     fun openSupport(supportEmailData: EmailData)

@@ -15,27 +15,30 @@ import com.arestov.playlistmaker.domain.search.model.Track
 import com.arestov.playlistmaker.ui.main.sharedPrefs
 import com.arestov.playlistmaker.utils.Debounce
 import com.arestov.playlistmaker.utils.ScreensHolder
+import kotlin.getValue
 
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private lateinit var viewModel: SearchViewModel
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var trackAdapter: TrackAdapter
+
+    private val viewModel by lazy {
+        ViewModelProvider(
+            this,
+            SearchViewModel.factory()
+        )[SearchViewModel::class.java]
+    }
 
     private val searchRunnable = Runnable {
         viewModel.searchTracks(getInputText())
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(
-            this,
-            Creator.provideSearchViewModelFactory(sharedPrefs)
-        ).get(SearchViewModel::class.java)
 
         setupAdapters()
         setupListeners()
@@ -102,20 +105,18 @@ class SearchActivity : AppCompatActivity() {
                 is SearchScreenState.Content -> showTracks(state.tracks)
                 is SearchScreenState.EmptyResult -> showNothingFound()
                 is SearchScreenState.NetworkError -> showNetworkProblem()
+                is SearchScreenState.HistoryContent -> {
+                    historyAdapter.updateData(state.historyTracks)
+                    updateHistoryVisibility()
+                }
             }
-        }
-
-        viewModel.historyTracksLiveData.observe(this) { history ->
-            historyAdapter.updateData(history)
-            updateHistoryVisibility()
         }
     }
 
     private fun updateHistoryVisibility() {
-        val hasFocus = binding.inputSearch.hasFocus()
         val hasNotText = binding.inputSearch.text.isEmpty()
-        val hasHistory = viewModel.hasHistoryTracks()
-        binding.historyContainer.isVisible = hasFocus && hasHistory && hasNotText
+        val hasHistory = historyAdapter.itemCount > 0
+        binding.historyContainer.isVisible = hasHistory && hasNotText
     }
 
     private fun hideContent() {

@@ -1,4 +1,4 @@
-package com.arestov.playlistmaker.domain.settings.model
+package com.arestov.playlistmaker.domain.model
 
 data class EmailData(
     val email: String,

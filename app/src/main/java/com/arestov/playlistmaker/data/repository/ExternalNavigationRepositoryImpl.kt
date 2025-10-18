@@ -5,10 +5,10 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.domain.repository.ExternalNavigatorRepository
-import com.arestov.playlistmaker.domain.settings.model.EmailData
+import com.arestov.playlistmaker.domain.repository.ExternalNavigationRepository
+import com.arestov.playlistmaker.domain.model.EmailData
 
-class ExternalNavigatorRepositoryImpl(private val context: Context) : ExternalNavigatorRepository {
+class ExternalNavigationRepositoryImpl(private val context: Context) : ExternalNavigationRepository {
 
     override fun shareApp(shareAppLink: String) {
         val intent = Intent(Intent.ACTION_SEND).apply {

@@ -7,11 +7,13 @@ import com.arestov.playlistmaker.R
 
 class MediaActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: MediaViewModel
+    private val viewModel by lazy {
+        ViewModelProvider(this, MediaViewModel.factory()
+        )[MediaViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
-        viewModel = ViewModelProvider(this).get(MediaViewModel::class.java)
     }
 }

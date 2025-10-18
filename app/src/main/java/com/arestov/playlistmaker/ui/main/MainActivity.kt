@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.arestov.playlistmaker.creator.Creator
 import com.arestov.playlistmaker.databinding.ActivityMainBinding
 import com.arestov.playlistmaker.utils.ScreensHolder
 import com.arestov.playlistmaker.utils.ScreensHolder.Screens.*
@@ -17,7 +16,12 @@ lateinit var sharedPrefs: SharedPreferences
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: MainViewModel
+    private val viewModel by lazy {
+        ViewModelProvider(this, MainViewModel.factory(
+                context = this,
+                sharedPreferences = sharedPrefs)
+        )[MainViewModel::class.java]
+    }
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,14 +29,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(
-            owner = this,
-            factory = Creator.provideMainViewModelFactory(
-                context = this,
-                sharedPreferences = sharedPrefs
-            )
-        ).get(MainViewModel::class.java)
 
         ThemeManager.setDarkMode(viewModel.getStateDarkMode())
 

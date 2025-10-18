@@ -3,24 +3,24 @@ package com.arestov.playlistmaker.ui.settings
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.arestov.playlistmaker.creator.Creator
 import com.arestov.playlistmaker.databinding.ActivitySettingsBinding
 import com.arestov.playlistmaker.utils.ThemeManager
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SettingsViewModel
+    private val viewModel by lazy {
+        ViewModelProvider(
+            this,
+            SettingsViewModel.factory(context = this)
+        )[SettingsViewModel::class.java]
+    }
+
     private lateinit var binding: ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(
-            this,
-            Creator.provideSettingsViewModelFactory(context = this)
-        ).get(SettingsViewModel::class.java)
 
         //Back
         binding.toolbarSettingsScreen.setNavigationOnClickListener {

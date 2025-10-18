@@ -7,4 +7,5 @@ sealed class SearchScreenState {
     data class Content(val tracks: List<Track>) : SearchScreenState()
     data object EmptyResult : SearchScreenState()
     data object NetworkError : SearchScreenState()
+    data class HistoryContent(val historyTracks: List<Track>) : SearchScreenState()
 }

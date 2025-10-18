@@ -4,30 +4,26 @@ import android.content.Context
 import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
 import com.arestov.playlistmaker.domain.search.usecases.GetTrackListUseCase
 import android.content.SharedPreferences
-import android.media.MediaPlayer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.arestov.playlistmaker.data.provider.SystemThemeProviderImpl
-import com.arestov.playlistmaker.data.repository.ExternalNavigatorRepositoryImpl
+import com.arestov.playlistmaker.data.repository.ExternalNavigationRepositoryImpl
 import com.arestov.playlistmaker.data.repository.PreferencesStorageRepositoryImpl
 import com.arestov.playlistmaker.data.repository.ThemeRepositoryImpl
-import com.arestov.playlistmaker.ui.player.PlayerViewModel
 import com.arestov.playlistmaker.data.search.network.TrackNetworkClient
 import com.arestov.playlistmaker.data.search.network.TrackRetrofitNetworkClient
 import com.arestov.playlistmaker.data.search.repository.TrackHistoryRepositoryImpl
 import com.arestov.playlistmaker.data.search.repository.TrackRepositoryImpl
-import com.arestov.playlistmaker.domain.repository.ExternalNavigatorRepository
+import com.arestov.playlistmaker.domain.interactor.ExternalNavigationInteractor
+import com.arestov.playlistmaker.domain.interactor.ThemeInteractor
+import com.arestov.playlistmaker.domain.interactor.impl.ExternalNavigationInteractorImpl
+import com.arestov.playlistmaker.domain.interactor.impl.ThemeInteractorImpl
+import com.arestov.playlistmaker.domain.provider.SystemThemeProvider
+import com.arestov.playlistmaker.domain.repository.ExternalNavigationRepository
 import com.arestov.playlistmaker.domain.repository.PreferencesStorageRepository
 import com.arestov.playlistmaker.domain.repository.ThemeRepository
 import com.arestov.playlistmaker.domain.search.repository.TrackHistoryRepository
 import com.arestov.playlistmaker.domain.search.repository.TrackRepository
-import com.arestov.playlistmaker.ui.main.MainViewModel
-import com.arestov.playlistmaker.ui.main.SWITCHER_DARK_THEME_STATE_KEY
 import com.arestov.playlistmaker.ui.main.TRACK_HISTORY_KEY
 import com.arestov.playlistmaker.ui.main.sharedPrefs
-import com.arestov.playlistmaker.ui.search.SearchViewModel
-import com.arestov.playlistmaker.ui.settings.SettingsViewModel
 import com.arestov.playlistmaker.utils.ResourceManager
 
 object Creator {
@@ -59,8 +55,14 @@ object Creator {
     }
 
     // ------------------ Settings ------------------
-    fun provideExternalNavigationRepository(context: Context): ExternalNavigatorRepository {
-        return ExternalNavigatorRepositoryImpl(context)
+    fun provideExternalNavigationRepository(context: Context): ExternalNavigationRepository {
+        return ExternalNavigationRepositoryImpl(context)
+    }
+
+    fun provideExternalNavigationInteractor(context: Context): ExternalNavigationInteractor {
+        return ExternalNavigationInteractorImpl(
+            repository = provideExternalNavigationRepository(context)
+        )
     }
 
     // ------------------ Preferences ------------------
@@ -78,17 +80,15 @@ object Creator {
 
     // ------------------ Theme ------------------
 
-    fun provideSystemThemeProviderImpl(context: Context): SystemThemeProviderImpl {
+    fun provideSystemThemeProvider(context: Context): SystemThemeProvider {
         return SystemThemeProviderImpl(context = context)
     }
 
     fun provideThemeRepository(
-        context: Context,
-        key: String,
-        sharedPref: SharedPreferences
+        context: Context, key: String, sharedPref: SharedPreferences
     ): ThemeRepository {
         return ThemeRepositoryImpl(
-            systemThemeProvider = provideSystemThemeProviderImpl(context),
+            systemThemeProvider = provideSystemThemeProvider(context),
             storage = providePreferencesStorageRepository(
                 key = key,
                 sharedPreferences = sharedPref
@@ -96,61 +96,11 @@ object Creator {
         )
     }
 
-    // ------------------ ViewModelFactory ------------------
-
-    fun provideMainViewModelFactory(
-        context: Context,
-        sharedPreferences: SharedPreferences
-    ): ViewModelProvider.Factory {
-        return viewModelFactory {
-            initializer {
-                MainViewModel(
-                    themeRepository = provideThemeRepository(
-                        context = context,
-                        key = SWITCHER_DARK_THEME_STATE_KEY,
-                        sharedPref = sharedPreferences
-                    )
-                )
-            }
-        }
-    }
-
-    fun providePlayerViewModelFactory(
-    ): ViewModelProvider.Factory {
-        return viewModelFactory {
-            initializer {
-                PlayerViewModel(
-                    MediaPlayer(),
-                    provideGetTrackHistoryUseCase()
-                )
-            }
-        }
-    }
-
-    fun provideSettingsViewModelFactory(context: Context): ViewModelProvider.Factory {
-        return viewModelFactory {
-            initializer {
-                SettingsViewModel(
-                    externalNavigatorRepository = provideExternalNavigationRepository(context),
-                    resourceManager = provideResourceManager(context),
-                    themeRepository = provideThemeRepository(
-                        context = context,
-                        key = SWITCHER_DARK_THEME_STATE_KEY,
-                        sharedPref = sharedPrefs
-                    )
-                )
-            }
-        }
-    }
-
-    fun provideSearchViewModelFactory(sharedPref: SharedPreferences): ViewModelProvider.Factory {
-        return viewModelFactory {
-            initializer {
-                SearchViewModel(
-                    getTrackListUseCase = provideGetTrackListUseCase(),
-                    getTrackHistoryInteractor = provideGetTrackHistoryUseCase()
-                )
-            }
-        }
+    fun provideThemeInteractor(
+        context: Context, key: String, sharedPref: SharedPreferences
+    ): ThemeInteractor {
+        return ThemeInteractorImpl(
+            themeRepository = provideThemeRepository(context, key, sharedPref)
+        )
     }
 }

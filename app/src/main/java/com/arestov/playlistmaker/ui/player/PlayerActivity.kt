@@ -5,7 +5,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.creator.Creator
 import com.arestov.playlistmaker.databinding.ActivityPlayerBinding
 import com.arestov.playlistmaker.domain.search.model.Track
 import com.arestov.playlistmaker.utils.Converter
@@ -13,18 +12,19 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 class PlayerActivity : AppCompatActivity() {
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel by lazy {
+        ViewModelProvider(
+            this,
+            PlayerViewModel.factory()
+        )[PlayerViewModel::class.java]
+    }
+
     private lateinit var binding: ActivityPlayerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(
-            this,
-            Creator.providePlayerViewModelFactory()
-        ).get(PlayerViewModel::class.java)
 
         val track = viewModel.getTrack()
 
