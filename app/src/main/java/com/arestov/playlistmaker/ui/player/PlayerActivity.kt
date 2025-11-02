@@ -7,18 +7,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.databinding.ActivityPlayerBinding
 import com.arestov.playlistmaker.domain.search.model.Track
+import com.arestov.playlistmaker.ui.media.MediaViewModel
 import com.arestov.playlistmaker.utils.Converter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
 class PlayerActivity : AppCompatActivity() {
-    private val viewModel by lazy {
-        ViewModelProvider(
-            this,
-            PlayerViewModel.factory()
-        )[PlayerViewModel::class.java]
-    }
-
+    private val viewModel: PlayerViewModel by viewModel()
     private lateinit var binding: ActivityPlayerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

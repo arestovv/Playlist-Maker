@@ -4,13 +4,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.arestov.playlistmaker.R
+import com.arestov.playlistmaker.ui.main.MainViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
 class MediaActivity : AppCompatActivity() {
 
-    private val viewModel by lazy {
-        ViewModelProvider(this, MediaViewModel.factory()
-        )[MediaViewModel::class.java]
-    }
+    private val viewModel: MediaViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

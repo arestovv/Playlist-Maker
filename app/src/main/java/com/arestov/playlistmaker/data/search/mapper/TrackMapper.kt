@@ -6,12 +6,15 @@ import com.arestov.playlistmaker.utils.Converter
 
 object TrackMapper {
 
-    fun map(dto: TrackDto): Track {
+    fun map(dto: TrackDto): Track? {
+        //Sometimes the app crashes because preview is empty
+        if (dto.previewUrl.isEmpty()) return null
+
         return Track(
             trackId = dto.trackId,
             trackName = dto.trackName,
             artistName = dto.artistName,
-            trackTimeSeconds = Converter.Companion.mmToSs(dto.trackTimeMillis),
+            trackTimeSeconds = Converter.mmToSs(dto.trackTimeMillis),
             artworkUrl100 = dto.artworkUrl100,
             artworkUrl512 = dto.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"),
             collectionName = dto.collectionName,
@@ -23,6 +26,6 @@ object TrackMapper {
     }
 
     fun mapList(dtos: List<TrackDto>): List<Track> {
-        return dtos.map { map(it) }
+        return dtos.mapNotNull { map(it) }
     }
 }

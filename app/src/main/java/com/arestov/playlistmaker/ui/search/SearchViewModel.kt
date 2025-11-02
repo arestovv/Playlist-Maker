@@ -1,12 +1,8 @@
 package com.arestov.playlistmaker.ui.search
 
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.arestov.playlistmaker.creator.Creator
 import com.arestov.playlistmaker.domain.search.consumer.Consumer
 import com.arestov.playlistmaker.domain.search.consumer.ConsumerData
 import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
@@ -65,16 +61,5 @@ class SearchViewModel(
                 }
             }
         )
-    }
-
-    companion object {
-        fun factory() = viewModelFactory {
-            initializer {
-                SearchViewModel(
-                    getTrackListUseCase = Creator.provideGetTrackListUseCase(),
-                    getTrackHistoryInteractor = Creator.provideGetTrackHistoryUseCase()
-                )
-            }
-        }
     }
 }

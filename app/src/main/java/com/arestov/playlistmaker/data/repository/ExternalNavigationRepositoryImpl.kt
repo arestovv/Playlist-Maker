@@ -8,19 +8,19 @@ import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.domain.repository.ExternalNavigationRepository
 import com.arestov.playlistmaker.domain.model.EmailData
 
-class ExternalNavigationRepositoryImpl(private val context: Context) : ExternalNavigationRepository {
+class ExternalNavigationRepositoryImpl(private val context: Context) :
+    ExternalNavigationRepository {
 
     override fun shareApp(shareAppLink: String) {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, shareAppLink)
         }
-        context.startActivity(
-            Intent.createChooser(
-                intent,
-                context.getString(R.string.share_info_message)
-            )
+        val chooser = Intent.createChooser(
+            intent, context.getString(R.string.share_info_message)
         )
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(chooser)
     }
 
     override fun openSupport(supportEmailData: EmailData) {
@@ -29,11 +29,13 @@ class ExternalNavigationRepositoryImpl(private val context: Context) : ExternalN
                 "&body=${Uri.encode(supportEmailData.body)}"
 
         val intent = Intent(Intent.ACTION_SENDTO, mailto.toUri())
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
     }
 
     override fun openTerms(termsLink: String) {
         val intent = Intent(Intent.ACTION_VIEW, termsLink.toUri())
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
     }
 }
