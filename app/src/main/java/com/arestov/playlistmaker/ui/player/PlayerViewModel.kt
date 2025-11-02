@@ -12,10 +12,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerViewModel(
-    private val historyInteractor: GetTrackHistoryInteractor
+    private val historyInteractor: GetTrackHistoryInteractor,
+    private val mediaPlayer: MediaPlayer
 ) : ViewModel() {
 
-    private val mediaPlayer: MediaPlayer by lazy { MediaPlayer() }
     private val playerStateMutableLiveData = MutableLiveData<PlayerState>(
         PlayerState.Default(progress = DEFAULT_TIMER)
     )

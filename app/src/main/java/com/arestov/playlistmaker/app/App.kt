@@ -3,6 +3,7 @@ package com.arestov.playlistmaker.app
 import android.app.Application
 import com.arestov.playlistmaker.di.dataModule
 import com.arestov.playlistmaker.di.interactorModule
+import com.arestov.playlistmaker.di.mediaModule
 import com.arestov.playlistmaker.di.repositoryModule
 import com.arestov.playlistmaker.di.useCaseModule
 import com.arestov.playlistmaker.di.utilsModule
@@ -22,7 +23,8 @@ class App : Application() {
                 interactorModule,
                 useCaseModule,
                 viewModelModule,
-                utilsModule
+                utilsModule,
+                mediaModule
             )
         }
     }

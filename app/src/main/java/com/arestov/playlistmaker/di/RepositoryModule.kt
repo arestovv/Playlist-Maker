@@ -14,7 +14,6 @@ import com.arestov.playlistmaker.domain.search.repository.TrackRepository
 import com.arestov.playlistmaker.ui.main.SWITCHER_DARK_THEME_STATE_KEY
 import com.arestov.playlistmaker.ui.main.TRACK_HISTORY_KEY
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -26,11 +25,11 @@ val repositoryModule = module {
     }
 
     single<TrackHistoryRepository> {
-        TrackHistoryRepositoryImpl(get(named(TRACK_HISTORY_KEY)))
+        TrackHistoryRepositoryImpl(get(named(TRACK_HISTORY_KEY)), get())
     }
 
     // TrackRepository
-    single<TrackRepository> {
+    factory<TrackRepository> {
         TrackRepositoryImpl(get())
     }
 

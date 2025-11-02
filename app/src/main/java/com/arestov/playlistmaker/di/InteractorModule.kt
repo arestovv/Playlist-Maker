@@ -9,7 +9,7 @@ import org.koin.dsl.module
 
 val interactorModule = module {
 
-    single<ExternalNavigationInteractor> {
+    factory<ExternalNavigationInteractor> {
         ExternalNavigationInteractorImpl(get())
     }
 

@@ -5,7 +5,7 @@ import org.koin.dsl.module
 
 val useCaseModule = module {
 
-    single<GetTrackListUseCase> {
+    factory<GetTrackListUseCase> {
         GetTrackListUseCase(get())
     }
 }
