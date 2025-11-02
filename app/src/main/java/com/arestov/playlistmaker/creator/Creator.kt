@@ -1,37 +1,49 @@
 package com.arestov.playlistmaker.creator
 
-import GetPreferencesStorageUseCase
-import GetTrackHistoryUseCase
-import GetTrackListUseCase
+import android.content.Context
+import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
+import com.arestov.playlistmaker.domain.search.usecases.GetTrackListUseCase
 import android.content.SharedPreferences
-import com.arestov.playlistmaker.data.network.TrackNetworkClient
-import com.arestov.playlistmaker.data.network.TrackRetrofitNetworkClient
-import com.arestov.playlistmaker.data.repository.PreferencesStorageImpl
-import com.arestov.playlistmaker.data.repository.TrackHistoryRepositoryImpl
-import com.arestov.playlistmaker.data.repository.TrackRepositoryImpl
-import com.arestov.playlistmaker.domain.repository.PreferencesStorage
-import com.arestov.playlistmaker.domain.repository.TrackHistoryRepository
-import com.arestov.playlistmaker.domain.repository.TrackRepository
+import com.arestov.playlistmaker.data.provider.SystemThemeProviderImpl
+import com.arestov.playlistmaker.data.repository.ExternalNavigationRepositoryImpl
+import com.arestov.playlistmaker.data.repository.PreferencesStorageRepositoryImpl
+import com.arestov.playlistmaker.data.repository.ThemeRepositoryImpl
+import com.arestov.playlistmaker.data.search.network.TrackNetworkClient
+import com.arestov.playlistmaker.data.search.network.TrackRetrofitNetworkClient
+import com.arestov.playlistmaker.data.search.repository.TrackHistoryRepositoryImpl
+import com.arestov.playlistmaker.data.search.repository.TrackRepositoryImpl
+import com.arestov.playlistmaker.domain.interactor.ExternalNavigationInteractor
+import com.arestov.playlistmaker.domain.interactor.ThemeInteractor
+import com.arestov.playlistmaker.domain.interactor.impl.ExternalNavigationInteractorImpl
+import com.arestov.playlistmaker.domain.interactor.impl.ThemeInteractorImpl
+import com.arestov.playlistmaker.domain.provider.SystemThemeProvider
+import com.arestov.playlistmaker.domain.repository.ExternalNavigationRepository
+import com.arestov.playlistmaker.domain.repository.PreferencesStorageRepository
+import com.arestov.playlistmaker.domain.repository.ThemeRepository
+import com.arestov.playlistmaker.domain.search.repository.TrackHistoryRepository
+import com.arestov.playlistmaker.domain.search.repository.TrackRepository
+import com.arestov.playlistmaker.ui.main.TRACK_HISTORY_KEY
+import com.arestov.playlistmaker.ui.main.sharedPrefs
+import com.arestov.playlistmaker.utils.ResourceManager
 
 object Creator {
+
+    // ------------------ Track ------------------
     fun provideGetTrackListUseCase(): GetTrackListUseCase {
         return GetTrackListUseCase(provideTrackRepository())
     }
 
-    fun provideGetTrackHistoryUseCase(sharedPreferences: SharedPreferences): GetTrackHistoryUseCase {
-            return GetTrackHistoryUseCase(provideTrackHistoryRepository(sharedPreferences))
+    fun provideGetTrackHistoryUseCase(): GetTrackHistoryInteractor {
+        return GetTrackHistoryInteractor(provideTrackHistoryRepository())
     }
 
-    fun provideGetPreferencesStorageUseCase(key: String, sharedPreferences: SharedPreferences): GetPreferencesStorageUseCase {
-        return GetPreferencesStorageUseCase(providePreferencesStorage(key, sharedPreferences))
-    }
-
-    private fun providePreferencesStorage(key: String, sharedPreferences: SharedPreferences): PreferencesStorage {
-        return PreferencesStorageImpl(key, sharedPreferences)
-    }
-
-    private fun provideTrackHistoryRepository(sharedPreferences: SharedPreferences): TrackHistoryRepository {
-        return TrackHistoryRepositoryImpl(sharedPreferences)
+    private fun provideTrackHistoryRepository(): TrackHistoryRepository {
+        return TrackHistoryRepositoryImpl(
+            storage = providePreferencesStorageRepository(
+                key = TRACK_HISTORY_KEY,
+                sharedPreferences = sharedPrefs
+            )
+        )
     }
 
     private fun provideTrackRepository(): TrackRepository {
@@ -40,5 +52,55 @@ object Creator {
 
     private fun provideTrackNetworkClient(): TrackNetworkClient {
         return TrackRetrofitNetworkClient()
+    }
+
+    // ------------------ Settings ------------------
+    fun provideExternalNavigationRepository(context: Context): ExternalNavigationRepository {
+        return ExternalNavigationRepositoryImpl(context)
+    }
+
+    fun provideExternalNavigationInteractor(context: Context): ExternalNavigationInteractor {
+        return ExternalNavigationInteractorImpl(
+            repository = provideExternalNavigationRepository(context)
+        )
+    }
+
+    // ------------------ Preferences ------------------
+    fun providePreferencesStorageRepository(
+        key: String,
+        sharedPreferences: SharedPreferences
+    ): PreferencesStorageRepository {
+        return PreferencesStorageRepositoryImpl(key, sharedPreferences)
+    }
+
+    // ------------------ Managers ------------------
+    fun provideResourceManager(context: Context): ResourceManager {
+        return ResourceManager(context)
+    }
+
+    // ------------------ Theme ------------------
+
+    fun provideSystemThemeProvider(context: Context): SystemThemeProvider {
+        return SystemThemeProviderImpl(context = context)
+    }
+
+    fun provideThemeRepository(
+        context: Context, key: String, sharedPref: SharedPreferences
+    ): ThemeRepository {
+        return ThemeRepositoryImpl(
+            systemThemeProvider = provideSystemThemeProvider(context),
+            storage = providePreferencesStorageRepository(
+                key = key,
+                sharedPreferences = sharedPref
+            )
+        )
+    }
+
+    fun provideThemeInteractor(
+        context: Context, key: String, sharedPref: SharedPreferences
+    ): ThemeInteractor {
+        return ThemeInteractorImpl(
+            themeRepository = provideThemeRepository(context, key, sharedPref)
+        )
     }
 }

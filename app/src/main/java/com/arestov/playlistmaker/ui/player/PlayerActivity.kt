@@ -1,163 +1,101 @@
 package com.arestov.playlistmaker.ui.player
 
-import GetTrackHistoryUseCase
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.Group
+import androidx.lifecycle.ViewModelProvider
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.creator.Creator
-import com.arestov.playlistmaker.presentation.MediaPlayerHelper
-import com.arestov.playlistmaker.ui.main.sharedPrefs
+import com.arestov.playlistmaker.databinding.ActivityPlayerBinding
+import com.arestov.playlistmaker.domain.search.model.Track
 import com.arestov.playlistmaker.utils.Converter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.google.android.material.appbar.MaterialToolbar
 
 class PlayerActivity : AppCompatActivity() {
-    private lateinit var historyHolder: GetTrackHistoryUseCase
-    lateinit var mediaPlayerHelper: MediaPlayerHelper
-    private lateinit var buttonPlay: ImageView
-    private lateinit var tvTimer: TextView
+    private val viewModel by lazy {
+        ViewModelProvider(
+            this,
+            PlayerViewModel.factory()
+        )[PlayerViewModel::class.java]
+    }
+
+    private lateinit var binding: ActivityPlayerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_player)
-        //Get selected track
-        historyHolder = Creator.provideGetTrackHistoryUseCase(sharedPrefs)
-        val track = historyHolder.getTracks().first()
-        mediaPlayerHelper = MediaPlayerHelper(track)
+        binding = ActivityPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        //mock for add track favorite
-        var trackIsFavorite = false
-        //mock add to playlist
-        var trackIsHasPlaylist = false
+        val track = viewModel.getTrack()
 
-        val imageAlbum: ImageView = findViewById(R.id.image_album_player_screen)
-        val tvTrackName: TextView = findViewById(R.id.track_name_player_screen)
-        val tvArtistName: TextView = findViewById(R.id.artist_name_player_screen)
-
-        buttonPlay = findViewById(R.id.button_play_player_screen)
-        tvTimer = findViewById(R.id.text_timer_player_screen)
-        val buttonAddToPlayList: ImageView = findViewById(R.id.button_add_to_playlist_player_screen)
-        val buttonAddToFavorite: ImageView = findViewById(R.id.button_add_to_favorite_player_screen)
-
-        val tvDurationValue: TextView = findViewById(R.id.value_duration_player_screen)
-        val tvAlbumValue: TextView = findViewById(R.id.value_album_player_screen)
-        val tvAlbumGroup: Group = findViewById(R.id.group_album_player_screen)
-        val tvYearValue: TextView = findViewById(R.id.value_year_player_screen)
-        val tvYearGroup: Group = findViewById(R.id.group_year_player_screen)
-        val tvGenre: TextView = findViewById(R.id.value_genre_player_screen)
-        val tvCountry: TextView = findViewById(R.id.value_country_player_screen)
+        //Слушатель состояние плеера
+        viewModel.playerStateLiveData.observe(this) { state ->
+            //Обновление таймера
+            binding.textTimer.text = state.progress
+            //Получаем состояние плеера (Playing = true, else false)
+            val isPlaying = state is PlayerState.Playing
+            //Смена иконки кнопки Play/Pause
+            changeButtonState(isPlaying = isPlaying)
+        }
 
         //Back
-        val back = findViewById<MaterialToolbar>(R.id.toolbar_player_screen)
-        back.setNavigationOnClickListener {
+        binding.toolbar.setNavigationOnClickListener {
             finish()
         }
 
         //Set image album
-        Glide.with(imageAlbum)
-            .load(track.artworkUrl512)
-            .placeholder(R.drawable.im_album_placeholder)
-            .transform(RoundedCorners(Converter.Companion.dpToPx(8f, this)))
-            .into(imageAlbum)
-
-        tvTimer.text = Converter.Companion.mmToSs(0)
-        tvTrackName.text = track.trackName
-        tvArtistName.text = track.artistName
-        tvDurationValue.text = track.trackTimeSeconds
-        tvGenre.text = track.primaryGenreName
-        tvCountry.text = track.country
-
-        prepareMediaPlayer()
+        setImage(track)
+        //Set track data
+        binding.apply {
+            textTimer.text = Converter.Companion.mmToSs(0)
+            trackName.text = track.trackName
+            artistName.text = track.artistName
+            valueDuration.text = track.trackTimeSeconds
+            valueGenre.text = track.primaryGenreName
+            valueCountry.text = track.country
+        }
 
         //Show album name
         if (track.collectionName.isNotEmpty()) {
-            tvAlbumValue.text = track.collectionName
-            tvAlbumGroup.visibility = View.VISIBLE
-        } else tvAlbumGroup.visibility = View.GONE
+            binding.valueAlbum.text = track.collectionName
+            binding.groupAlbum.visibility = View.VISIBLE
+        } else binding.groupAlbum.visibility = View.GONE
 
         //Show year
         if (track.releaseYear.isNotEmpty()) {
-            tvYearValue.text = track.releaseYear
-            tvYearGroup.visibility = View.VISIBLE
-        } else tvYearGroup.visibility = View.GONE
-
-        //Add track to favorite
-        buttonAddToFavorite.setOnClickListener {
-            if (trackIsFavorite) {
-                buttonAddToFavorite.setImageResource(R.drawable.ic_button_add_to_favorite)
-                trackIsFavorite = false
-            } else {
-                buttonAddToFavorite.setImageResource(R.drawable.ic_button_added_to_favorite)
-                trackIsFavorite = true
-            }
-        }
+            binding.valueYear.text = track.releaseYear
+            binding.groupYear.visibility = View.VISIBLE
+        } else binding.groupYear.visibility = View.GONE
 
         //Play/pause track
-        buttonPlay.setOnClickListener {
-            if (mediaPlayerHelper.isPlaying()) {
-                pausePlayer()
-            } else {
-                startPlayer()
-            }
+        binding.buttonPlay.setOnClickListener {
+            viewModel.onPlayButtonClicked()
         }
-
-        //Add track to playlist
-        buttonAddToPlayList.setOnClickListener {
-            if (trackIsHasPlaylist) {
-                buttonAddToPlayList.setImageResource(R.drawable.ic_button_add_to_playlist)
-                trackIsHasPlaylist = false
-            } else {
-                buttonAddToPlayList.setImageResource(R.drawable.ic_button_added_to_playlist)
-                trackIsHasPlaylist = true
-            }
-        }
-
-        //Listener for timer
-        mediaPlayerHelper.setOnTimerTickListener(object : MediaPlayerHelper.OnTimerTickListener {
-            override fun onTimerTick(formattedTime: String) {
-                tvTimer.text = formattedTime
-            }
-        })
-
-        // Set button play when track is completed
-        mediaPlayerHelper.setOnPlaybackStateChangedListener(object :
-            MediaPlayerHelper.OnPlaybackStateChangedListener {
-            override fun onPlaybackCompleted() {
-                runOnUiThread {
-                    buttonPlay.setImageResource(R.drawable.ic_button_play) // ← ставим иконку play
-                }
-            }
-        })
     }
 
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        viewModel.onPause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayerHelper.release()
+        viewModel.onDestroy()
     }
 
-    private fun prepareMediaPlayer() {
-        mediaPlayerHelper.prepare()
-        buttonPlay.setImageResource(R.drawable.ic_button_play)
-        tvTimer.text = Converter.Companion.mmToSs(0)
+    private fun changeButtonState(isPlaying: Boolean) {
+        if (isPlaying) {
+            binding.buttonPlay.setImageResource(R.drawable.ic_button_pause)
+        } else {
+            binding.buttonPlay.setImageResource(R.drawable.ic_button_play)
+        }
     }
 
-    private fun startPlayer() {
-        mediaPlayerHelper.start()
-        buttonPlay.setImageResource(R.drawable.ic_button_pause)
-    }
-
-    private fun pausePlayer() {
-        mediaPlayerHelper.pause()
-        buttonPlay.setImageResource(R.drawable.ic_button_play)
+    private fun setImage(track: Track) {
+        Glide.with(binding.imageAlbum)
+            .load(track.artworkUrl512)
+            .placeholder(R.drawable.im_album_placeholder)
+            .transform(RoundedCorners(Converter.Companion.dpToPx(8f, this)))
+            .into(binding.imageAlbum)
     }
 }
