@@ -107,7 +107,7 @@
         <!-- Info image  -->
         <ImageView
             android:id="@+id/info_container_image"
-            style="@style/SearchScreenContainers"
+            style="@style/Container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -116,7 +116,7 @@
         <!--  Info message  -->
         <TextView
             android:id="@+id/info_container_text"
-            style="@style/SearchScreenContainers"
+            style="@style/Container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -128,7 +128,7 @@
         <!-- Button retry request   -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/info_container_button"
-            style="@style/SearchScreenButtons"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -148,7 +148,7 @@
         <!--  History message  -->
         <TextView
             android:id="@+id/history_text"
-            style="@style/SearchScreenContainers"
+            style="@style/Container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -170,7 +170,7 @@
         <!-- Button clear history   -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_clear_history"
-            style="@style/SearchScreenButtons"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

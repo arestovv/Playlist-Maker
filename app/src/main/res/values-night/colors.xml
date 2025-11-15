@@ -21,5 +21,10 @@
     <!--Player-->
     <color name="background_player_screen">@color/yp_black</color>
     <color name="color_buttons_player_screen">@color/yp_white</color>
+
+    <!--Media-->
+    <color name="background_media_screen">@color/yp_black</color>
+    <color name="tab_indicator_color">@color/yp_white</color>
+    <color name="color_buttons_media_screen">@color/yp_white</color>
 </resources>
 
