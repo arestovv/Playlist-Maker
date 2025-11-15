@@ -6,17 +6,14 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.arestov.playlistmaker.creator.Creator
 import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
 import com.arestov.playlistmaker.domain.search.model.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerViewModel(
-    private val mediaPlayer: MediaPlayer,
-    private val historyInteractor: GetTrackHistoryInteractor
+    private val historyInteractor: GetTrackHistoryInteractor,
+    private val mediaPlayer: MediaPlayer
 ) : ViewModel() {
 
     private val playerStateMutableLiveData = MutableLiveData<PlayerState>(
@@ -121,14 +118,5 @@ class PlayerViewModel(
 
     companion object {
         const val DEFAULT_TIMER = "00:00"
-
-        fun factory() = viewModelFactory {
-            initializer {
-                PlayerViewModel(
-                    MediaPlayer(),
-                    Creator.provideGetTrackHistoryUseCase()
-                )
-            }
-        }
     }
 }

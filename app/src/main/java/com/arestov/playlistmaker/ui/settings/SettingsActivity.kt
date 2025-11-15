@@ -5,15 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.arestov.playlistmaker.databinding.ActivitySettingsBinding
 import com.arestov.playlistmaker.utils.ThemeManager
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
 class SettingsActivity : AppCompatActivity() {
 
-    private val viewModel by lazy {
-        ViewModelProvider(
-            this,
-            SettingsViewModel.factory(context = this)
-        )[SettingsViewModel::class.java]
-    }
+  private val viewModel by viewModel<SettingsViewModel>()
 
     private lateinit var binding: ActivitySettingsBinding
 

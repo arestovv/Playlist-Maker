@@ -6,15 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.creator.Creator
 import com.arestov.playlistmaker.databinding.ActivitySearchBinding
 import com.arestov.playlistmaker.domain.search.model.Track
-import com.arestov.playlistmaker.ui.main.sharedPrefs
 import com.arestov.playlistmaker.utils.Debounce
 import com.arestov.playlistmaker.utils.ScreensHolder
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
 class SearchActivity : AppCompatActivity() {
@@ -23,13 +21,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var trackAdapter: TrackAdapter
 
-    private val viewModel by lazy {
-        ViewModelProvider(
-            this,
-            SearchViewModel.factory()
-        )[SearchViewModel::class.java]
-    }
-
+    private val viewModel: SearchViewModel by viewModel()
     private val searchRunnable = Runnable {
         viewModel.searchTracks(getInputText())
     }

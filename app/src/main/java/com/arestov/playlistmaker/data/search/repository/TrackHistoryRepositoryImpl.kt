@@ -6,7 +6,10 @@ import com.arestov.playlistmaker.domain.search.repository.TrackHistoryRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class TrackHistoryRepositoryImpl(private val storage: PreferencesStorageRepository) :
+class TrackHistoryRepositoryImpl(
+    private val storage: PreferencesStorageRepository,
+    private val gson: Gson
+) :
     TrackHistoryRepository {
     private var listTracks = ArrayList<Track>()
 
@@ -45,7 +48,7 @@ class TrackHistoryRepositoryImpl(private val storage: PreferencesStorageReposito
 
     //Save tracks list to sharedPreferences
     private fun setListToPrefs(list: List<Track>) {
-        val json = Gson().toJson(list)
+        val json = gson.toJson(list)
         storage.putString(json)
     }
 
