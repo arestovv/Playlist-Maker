@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="CustomTabLayout">
+        <item name="tabTextAppearance">@style/CustomTabText</item>
+        <item name="tabIndicatorColor">@color/tab_indicator_color</item>
+        <item name="tabTextColor">@color/text_color</item>
+        <item name="tabSelectedTextColor">@color/text_color</item>
+        <item name="android:background">@color/background_media_screen</item>
+    </style>
+
+    <style name="CustomTabText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+    </style>
+
+</resources>
