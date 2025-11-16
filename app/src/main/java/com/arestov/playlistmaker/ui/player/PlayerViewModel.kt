@@ -111,11 +111,6 @@ class PlayerViewModel(
         pausePlayer()
     }
 
-    fun onDestroy() {
-        onCleared()
-    }
-
-
     companion object {
         const val DEFAULT_TIMER = "00:00"
     }

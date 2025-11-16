@@ -1,23 +1,29 @@
 package com.arestov.playlistmaker.ui.search
 
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.databinding.ActivitySearchBinding
+import com.arestov.playlistmaker.databinding.FragmentSearchBinding
 import com.arestov.playlistmaker.domain.search.model.Track
+import com.arestov.playlistmaker.ui.player.PlayerFragment
 import com.arestov.playlistmaker.utils.Debounce
-import com.arestov.playlistmaker.utils.ScreensHolder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
-    private lateinit var binding: ActivitySearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var trackAdapter: TrackAdapter
 
@@ -26,35 +32,56 @@ class SearchActivity : AppCompatActivity() {
         viewModel.searchTracks(getInputText())
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentSearchBinding.inflate(layoutInflater)
+        return _binding!!.root
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()
         setupListeners()
         observeViewModel()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun setupAdapters() {
         historyAdapter = TrackAdapter(emptyList()) { track ->
             viewModel.addHistoryTrack(track)
-            ScreensHolder.launch(ScreensHolder.Screens.PLAYER, this)
+            launchPlayerFragment()
         }
         binding.historyRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@SearchActivity)
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = historyAdapter
         }
 
         trackAdapter = TrackAdapter(emptyList()) { track ->
             viewModel.addHistoryTrack(track)
-            ScreensHolder.launch(ScreensHolder.Screens.PLAYER, this)
+            launchPlayerFragment()
         }
 
         binding.trackRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@SearchActivity)
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = trackAdapter
+        }
+    }
+
+    private fun launchPlayerFragment() {
+        requireActivity().supportFragmentManager.commit {
+            replace(
+                R.id.rootFragmentContainerView,
+                PlayerFragment.newInstance()
+            )
+            addToBackStack(PlayerFragment.TAG)
         }
     }
 
@@ -86,12 +113,12 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.toolbarSearchScreen.setNavigationOnClickListener {
-            finish()
+            parentFragmentManager.popBackStack()
         }
     }
 
     private fun observeViewModel() {
-        viewModel.screenStateLiveData.observe(this) { state ->
+        viewModel.screenStateLiveData.observe(getViewLifecycleOwner()) { state ->
             when (state) {
                 is SearchScreenState.Loading -> showProgressBar()
                 is SearchScreenState.Content -> showTracks(state.tracks)
@@ -160,7 +187,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showKeyboard(state: Boolean) {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         if (state) imm.showSoftInput(binding.inputSearch, InputMethodManager.SHOW_IMPLICIT)
         else imm.hideSoftInputFromWindow(binding.inputSearch.windowToken, 0)
     }
@@ -179,18 +206,23 @@ class SearchActivity : AppCompatActivity() {
         outState.putString(SEARCH_TEXT, getInputText())
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        val savedText = savedInstanceState.getString(SEARCH_TEXT, EMPTY)
-        binding.inputSearch.setText(savedText)
-        binding.buttonClearInputSearch.isVisible = savedText.isNotEmpty()
-        if (savedText.isNotEmpty()) {
-            viewModel.searchTracks(savedText)
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+
+        savedInstanceState?.let { bundle ->
+            val savedText = bundle.getString(SEARCH_TEXT, "")
+            binding.inputSearch.setText(savedText)
+            binding.buttonClearInputSearch.isVisible = savedText.isNotEmpty()
+            if (savedText.isNotEmpty()) {
+                viewModel.searchTracks(savedText)
+            }
         }
     }
 
     companion object {
         const val SEARCH_TEXT = "SEARCH_TEXT"
         const val EMPTY = ""
+        const val TAG = "SearchFragment"
+        fun newInstance() = SearchFragment()
     }
 }
