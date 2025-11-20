@@ -7,7 +7,7 @@ import com.arestov.playlistmaker.data.provider.SystemThemeProviderImpl
 import com.arestov.playlistmaker.data.search.network.RetrofitClient
 import com.arestov.playlistmaker.data.search.network.TrackNetworkClient
 import com.arestov.playlistmaker.domain.provider.SystemThemeProvider
-import com.arestov.playlistmaker.ui.main.PLAYLIST_MAKER_PREFERENCES
+import com.arestov.playlistmaker.ui.root.PLAYLIST_MAKER_PREFERENCES
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

@@ -10,12 +10,11 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.databinding.FragmentSearchBinding
 import com.arestov.playlistmaker.domain.search.model.Track
-import com.arestov.playlistmaker.ui.player.PlayerFragment
 import com.arestov.playlistmaker.utils.Debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
@@ -51,6 +50,7 @@ class SearchFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Debounce.removeCallbacks(searchRunnable)
         _binding = null
     }
 
@@ -76,13 +76,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun launchPlayerFragment() {
-        requireActivity().supportFragmentManager.commit {
-            replace(
-                R.id.rootFragmentContainerView,
-                PlayerFragment.newInstance()
-            )
-            addToBackStack(PlayerFragment.TAG)
-        }
+        findNavController().navigate(R.id.action_searchFragment_to_playerFragment)
     }
 
     private fun setupListeners() {
@@ -110,10 +104,6 @@ class SearchFragment : Fragment() {
         binding.inputSearch.setOnClickListener {
             binding.inputSearch.requestFocus()
             showKeyboard(state = true)
-        }
-
-        binding.toolbarSearchScreen.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
         }
     }
 
@@ -203,7 +193,8 @@ class SearchFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(SEARCH_TEXT, getInputText())
+        val text = _binding?.inputSearch?.text?.toString() ?: EMPTY
+        outState.putString(SEARCH_TEXT, text)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -222,7 +213,5 @@ class SearchFragment : Fragment() {
     companion object {
         const val SEARCH_TEXT = "SEARCH_TEXT"
         const val EMPTY = ""
-        const val TAG = "SearchFragment"
-        fun newInstance() = SearchFragment()
     }
 }

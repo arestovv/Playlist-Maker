@@ -29,11 +29,6 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Back
-        binding.toolbarSettingsScreen.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
-
         //Switch theme
         viewModel.themeStateLiveData.observe(getViewLifecycleOwner()) { state ->
             binding.switcherTheme.isChecked = state
@@ -63,10 +58,5 @@ class SettingsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        const val TAG = "SettingsFragment"
-        fun newInstance() = SettingsFragment()
     }
 }

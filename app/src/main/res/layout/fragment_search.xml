@@ -8,7 +8,9 @@
     android:background="@color/background_search_screen"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
+    tools:context="com.arestov.playlistmaker.ui.search.SearchFragment"
     >
+
     <!-- Header Toolbar  -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_search_screen"
@@ -45,6 +47,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@android:color/transparent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:fontFamily="@font/ys_display_regular"
             android:hint="@string/search"
             android:imeOptions="actionDone"
@@ -59,8 +63,6 @@
             android:textColorHint="@color/color_edit_search_screen"
             android:textCursorDrawable="@color/yp_black"
             android:textSize="16sp"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             />
 
         <!--  Clean button      -->

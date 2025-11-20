@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.databinding.FragmentPlayerBinding
 import com.arestov.playlistmaker.domain.search.model.Track
@@ -45,7 +46,7 @@ class PlayerFragment : Fragment() {
 
         //Back
         binding.toolbar.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
+            findNavController().navigateUp()
         }
 
         //Set image album
@@ -102,10 +103,5 @@ class PlayerFragment : Fragment() {
             .placeholder(R.drawable.im_album_placeholder)
             .transform(RoundedCorners(Converter.Companion.dpToPx(8f, requireContext())))
             .into(binding.imageAlbum)
-    }
-
-    companion object {
-        const val TAG = "PlayerFragment"
-        fun newInstance() = PlayerFragment()
     }
 }
