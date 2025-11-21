@@ -26,5 +26,9 @@
     <color name="background_media_screen">@color/yp_black</color>
     <color name="tab_indicator_color">@color/yp_white</color>
     <color name="color_buttons_media_screen">@color/yp_white</color>
+
+    <!--Root-->
+    <color name="bottom_navigation">@color/yp_black</color>
+
 </resources>
 

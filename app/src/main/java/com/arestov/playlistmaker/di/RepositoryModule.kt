@@ -11,11 +11,12 @@ import com.arestov.playlistmaker.domain.repository.PreferencesStorageRepository
 import com.arestov.playlistmaker.domain.repository.ThemeRepository
 import com.arestov.playlistmaker.domain.search.repository.TrackHistoryRepository
 import com.arestov.playlistmaker.domain.search.repository.TrackRepository
-import com.arestov.playlistmaker.ui.main.SWITCHER_DARK_THEME_STATE_KEY
-import com.arestov.playlistmaker.ui.main.TRACK_HISTORY_KEY
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+
+private const val SWITCHER_DARK_THEME_STATE_KEY = "switcher_dark_theme_state_key"
+private const val TRACK_HISTORY_KEY = "track_history"
 
 val repositoryModule = module {
 

@@ -7,9 +7,6 @@ import com.arestov.playlistmaker.utils.Converter
 object TrackMapper {
 
     fun map(dto: TrackDto): Track? {
-        //Sometimes the app crashes because preview is empty
-        if (dto.previewUrl.isEmpty()) return null
-
         return Track(
             trackId = dto.trackId,
             trackName = dto.trackName,
@@ -21,7 +18,7 @@ object TrackMapper {
             releaseYear = dto.releaseDate?.split("-")?.firstOrNull() ?: "",
             primaryGenreName = dto.primaryGenreName,
             country = dto.country,
-            previewUrl = dto.previewUrl
+            previewUrl = dto.previewUrl.toString()
         )
     }
 

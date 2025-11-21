@@ -33,6 +33,10 @@
     <color name="tab_indicator_color">@color/yp_black</color>
     <color name="color_buttons_media_screen">@color/yp_black</color>
 
+    <!--Root-->
+    <color name="bottom_navigation">@color/yp_white</color>
+    <color name="bottom_navigation_top_strip">@color/yp_light_gray</color>
+
     <!--Colors-->
     <color name="yp_white">#FFFFFF</color>
     <color name="yp_gray">#AEAFB4</color>

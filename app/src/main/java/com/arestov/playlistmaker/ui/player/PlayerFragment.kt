@@ -1,32 +1,41 @@
 package com.arestov.playlistmaker.ui.player
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.arestov.playlistmaker.R
-import com.arestov.playlistmaker.databinding.ActivityPlayerBinding
+import com.arestov.playlistmaker.databinding.FragmentPlayerBinding
 import com.arestov.playlistmaker.domain.search.model.Track
-import com.arestov.playlistmaker.ui.media.MediaViewModel
 import com.arestov.playlistmaker.utils.Converter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
-class PlayerActivity : AppCompatActivity() {
+class PlayerFragment : Fragment() {
     private val viewModel: PlayerViewModel by viewModel()
-    private lateinit var binding: ActivityPlayerBinding
+    private var _binding: FragmentPlayerBinding? = null
+    private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentPlayerBinding.inflate(inflater, container, false)
+        return _binding!!.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val track = viewModel.getTrack()
 
         //Слушатель состояние плеера
-        viewModel.playerStateLiveData.observe(this) { state ->
+        viewModel.playerStateLiveData.observe(getViewLifecycleOwner()) { state ->
             //Обновление таймера
             binding.textTimer.text = state.progress
             //Получаем состояние плеера (Playing = true, else false)
@@ -37,7 +46,7 @@ class PlayerActivity : AppCompatActivity() {
 
         //Back
         binding.toolbar.setNavigationOnClickListener {
-            finish()
+            findNavController().navigateUp()
         }
 
         //Set image album
@@ -75,9 +84,9 @@ class PlayerActivity : AppCompatActivity() {
         viewModel.onPause()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun changeButtonState(isPlaying: Boolean) {
@@ -92,7 +101,7 @@ class PlayerActivity : AppCompatActivity() {
         Glide.with(binding.imageAlbum)
             .load(track.artworkUrl512)
             .placeholder(R.drawable.im_album_placeholder)
-            .transform(RoundedCorners(Converter.Companion.dpToPx(8f, this)))
+            .transform(RoundedCorners(Converter.Companion.dpToPx(8f, requireContext())))
             .into(binding.imageAlbum)
     }
 }
