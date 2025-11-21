@@ -16,22 +16,27 @@ class SearchViewModel(
 
     private val screenState = MutableLiveData<SearchScreenState>()
     val screenStateLiveData: LiveData<SearchScreenState> = screenState
+    private var previousText = ""
 
     init {
         loadHistory()
     }
 
     fun loadHistory() {
-        screenState.postValue(
-            SearchScreenState.HistoryContent(
-                historyTracks = getTrackHistoryInteractor.getTracks()
+        if (getTrackHistoryInteractor.getTracks().isNotEmpty()) {
+            screenState.postValue(
+                SearchScreenState.HistoryContent(
+                    historyTracks = getTrackHistoryInteractor.getTracks()
+                )
             )
-        )
+        } else {
+            screenState.postValue(SearchScreenState.EmptyHistory)
+        }
+
     }
 
     fun addHistoryTrack(track: Track) {
         getTrackHistoryInteractor.addTrack(track)
-        loadHistory()
     }
 
     fun clearHistoryTrack() {
@@ -40,9 +45,10 @@ class SearchViewModel(
     }
 
     fun searchTracks(searchText: String) {
-        if (searchText.isEmpty()) return
+        if (searchText.isEmpty() || searchText == previousText) return
 
         screenState.postValue(SearchScreenState.Loading)
+        previousText = searchText
 
         getTrackListUseCase.execute(
             text = searchText,

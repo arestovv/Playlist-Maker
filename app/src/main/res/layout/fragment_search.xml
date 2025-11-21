@@ -57,7 +57,7 @@
             android:maxLines="1"
             android:paddingStart="36dp"
             android:paddingEnd="36dp"
-            android:saveEnabled="false"
+            android:saveEnabled="true"
             android:singleLine="true"
             android:textColor="@color/text_color_edit_search_screen"
             android:textColorHint="@color/color_edit_search_screen"

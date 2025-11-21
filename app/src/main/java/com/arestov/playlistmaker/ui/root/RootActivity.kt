@@ -10,10 +10,6 @@ import com.arestov.playlistmaker.databinding.ActivityRootBinding
 import com.arestov.playlistmaker.utils.ThemeManager
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
-const val SWITCHER_DARK_THEME_STATE_KEY = "switcher_dark_theme_state_key"
-const val TRACK_HISTORY_KEY = "track_history"
-
 class RootActivity : AppCompatActivity() {
     private val viewModel: RootViewModel by viewModel()
 

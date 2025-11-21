@@ -3,6 +3,7 @@ package com.arestov.playlistmaker.ui.search
 import com.arestov.playlistmaker.domain.search.model.Track
 
 sealed class SearchScreenState {
+    data object EmptyHistory : SearchScreenState()
     data object Loading : SearchScreenState()
     data class Content(val tracks: List<Track>) : SearchScreenState()
     data object EmptyResult : SearchScreenState()

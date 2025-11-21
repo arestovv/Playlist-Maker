@@ -25,7 +25,6 @@ class SearchFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var trackAdapter: TrackAdapter
-
     private val viewModel: SearchViewModel by viewModel()
     private val searchRunnable = Runnable {
         viewModel.searchTracks(getInputText())
@@ -87,14 +86,12 @@ class SearchFragment : Fragment() {
         binding.inputSearch.doOnTextChanged { text, _, _, _ ->
             Debounce.searchDebounce(searchRunnable)
             binding.buttonClearInputSearch.isVisible = !text.isNullOrEmpty()
-            if (text.isNullOrEmpty()) hideContent()
-            updateHistoryVisibility()
+            if (text.isNullOrEmpty()) viewModel.loadHistory()
         }
 
         binding.buttonClearInputSearch.setOnClickListener {
-            binding.inputSearch.setText(EMPTY)
+            binding.inputSearch.setText("")
             showKeyboard(state = false)
-            hideContent()
         }
 
         binding.buttonClearHistory.setOnClickListener {
@@ -114,21 +111,30 @@ class SearchFragment : Fragment() {
                 is SearchScreenState.Content -> showTracks(state.tracks)
                 is SearchScreenState.EmptyResult -> showNothingFound()
                 is SearchScreenState.NetworkError -> showNetworkProblem()
-                is SearchScreenState.HistoryContent -> {
-                    historyAdapter.updateData(state.historyTracks)
-                    updateHistoryVisibility()
-                }
+                is SearchScreenState.HistoryContent -> showHistory(state.historyTracks)
+                is SearchScreenState.EmptyHistory -> showEmpty()
             }
         }
     }
 
-    private fun updateHistoryVisibility() {
-        val hasNotText = binding.inputSearch.text.isEmpty()
-        val hasHistory = historyAdapter.itemCount > 0
-        binding.historyContainer.isVisible = hasHistory && hasNotText
+    private fun showHistory(tracks: List<Track>) {
+        historyAdapter.updateData(tracks)
+        binding.apply {
+            historyContainer.isVisible = true
+            historyRecyclerView.isVisible = true
+            hideSearchContent()
+        }
     }
 
-    private fun hideContent() {
+    private fun showEmpty() {
+        binding.apply {
+            historyContainer.isGone = true
+            historyRecyclerView.isGone = true
+            hideSearchContent()
+        }
+    }
+
+    private fun hideSearchContent() {
         binding.apply {
             trackRecyclerView.isGone = true
             infoContainer.isGone = true
@@ -158,6 +164,7 @@ class SearchFragment : Fragment() {
         binding.apply {
             infoContainerImage.setImageResource(R.drawable.ic_nothing_found)
             infoContainerText.setText(R.string.nothing_found)
+            historyContainer.isGone = true
             trackRecyclerView.isGone = true
             infoContainerButton.isGone = true
             infoContainer.isVisible = true
@@ -170,6 +177,7 @@ class SearchFragment : Fragment() {
             infoContainerImage.setImageResource(R.drawable.ic_network_problem)
             infoContainerText.setText(R.string.network_problem)
             trackRecyclerView.isGone = true
+            historyContainer.isGone = true
             infoContainerButton.isVisible = true
             infoContainer.isVisible = true
             progressBar.isGone = true
@@ -184,34 +192,5 @@ class SearchFragment : Fragment() {
 
     private fun getInputText(): String {
         return binding.inputSearch.text.toString()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Debounce.removeCallbacks(searchRunnable)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        val text = _binding?.inputSearch?.text?.toString() ?: EMPTY
-        outState.putString(SEARCH_TEXT, text)
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-
-        savedInstanceState?.let { bundle ->
-            val savedText = bundle.getString(SEARCH_TEXT, "")
-            binding.inputSearch.setText(savedText)
-            binding.buttonClearInputSearch.isVisible = savedText.isNotEmpty()
-            if (savedText.isNotEmpty()) {
-                viewModel.searchTracks(savedText)
-            }
-        }
-    }
-
-    companion object {
-        const val SEARCH_TEXT = "SEARCH_TEXT"
-        const val EMPTY = ""
     }
 }
