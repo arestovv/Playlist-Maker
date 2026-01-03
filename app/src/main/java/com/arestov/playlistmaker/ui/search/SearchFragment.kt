@@ -10,12 +10,12 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.databinding.FragmentSearchBinding
 import com.arestov.playlistmaker.domain.search.model.Track
-import com.arestov.playlistmaker.utils.Debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
@@ -26,9 +26,6 @@ class SearchFragment : Fragment() {
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var trackAdapter: TrackAdapter
     private val viewModel: SearchViewModel by viewModel()
-    private val searchRunnable = Runnable {
-        viewModel.searchTracks(getInputText())
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,12 +46,14 @@ class SearchFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Debounce.removeCallbacks(searchRunnable)
         _binding = null
     }
 
     private fun setupAdapters() {
-        historyAdapter = TrackAdapter(emptyList()) { track ->
+        historyAdapter = TrackAdapter(
+            data = emptyList(),
+            coroutineScope = viewLifecycleOwner.lifecycleScope
+        ) { track ->
             viewModel.addHistoryTrack(track)
             launchPlayerFragment()
         }
@@ -63,7 +62,10 @@ class SearchFragment : Fragment() {
             adapter = historyAdapter
         }
 
-        trackAdapter = TrackAdapter(emptyList()) { track ->
+        trackAdapter = TrackAdapter(
+            data = emptyList(),
+            coroutineScope = viewLifecycleOwner.lifecycleScope
+        ) { track ->
             viewModel.addHistoryTrack(track)
             launchPlayerFragment()
         }
@@ -84,9 +86,8 @@ class SearchFragment : Fragment() {
         showKeyboard(state = true)
 
         binding.inputSearch.doOnTextChanged { text, _, _, _ ->
-            Debounce.searchDebounce(searchRunnable)
+            viewModel.onSearchTextChanged(text.toString())
             binding.buttonClearInputSearch.isVisible = !text.isNullOrEmpty()
-            if (text.isNullOrEmpty()) viewModel.loadHistory()
         }
 
         binding.buttonClearInputSearch.setOnClickListener {
@@ -188,9 +189,5 @@ class SearchFragment : Fragment() {
         val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         if (state) imm.showSoftInput(binding.inputSearch, InputMethodManager.SHOW_IMPLICIT)
         else imm.hideSoftInputFromWindow(binding.inputSearch.windowToken, 0)
-    }
-
-    private fun getInputText(): String {
-        return binding.inputSearch.text.toString()
     }
 }

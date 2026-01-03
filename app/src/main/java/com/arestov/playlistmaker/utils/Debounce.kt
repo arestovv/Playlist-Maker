@@ -1,29 +1,26 @@
 package com.arestov.playlistmaker.utils
 
-import android.os.Handler
-import android.os.Looper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 object Debounce {
-    private var isClickAllowed = true
-    private const val CLICK_DEBOUNCE_DELAY = 1000L
-    private const val SEARCH_DEBOUNCE_DELAY = 2000L
-    private val handler = Handler(Looper.getMainLooper())
-
-    fun isClickAllowed(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+    fun <T> debounce(delayMillis: Long,
+                     coroutineScope: CoroutineScope,
+                     useLastParam: Boolean,
+                     action: (T) -> Unit): (T) -> Unit {
+        var debounceJob: Job? = null
+        return { param: T ->
+            if (useLastParam) {
+                debounceJob?.cancel()
+            }
+            if (debounceJob?.isCompleted != false || useLastParam) {
+                debounceJob = coroutineScope.launch {
+                    delay(delayMillis)
+                    action(param)
+                }
+            }
         }
-        return current
-    }
-
-    fun searchDebounce(searchRunnable: Runnable) {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-    }
-
-    fun removeCallbacks(searchRunnable: Runnable) {
-        handler.removeCallbacks(searchRunnable)
     }
 }

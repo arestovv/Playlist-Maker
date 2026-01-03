@@ -1,27 +1,21 @@
 package com.arestov.playlistmaker.domain.search.usecases
 
-import com.arestov.playlistmaker.domain.search.consumer.Consumer
-import com.arestov.playlistmaker.domain.search.consumer.ConsumerData
 import com.arestov.playlistmaker.domain.search.entity.Resource
 import com.arestov.playlistmaker.domain.search.model.Track
 import com.arestov.playlistmaker.domain.search.repository.TrackRepository
-import java.util.concurrent.Executors
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class GetTrackListUseCase(private val trackRepository: TrackRepository) {
 
-    private val executor = Executors.newSingleThreadExecutor()
-
-    fun execute(text: String, consumer: Consumer<List<Track>>) {
-        executor.execute {
-            val resource = trackRepository.getTracks(text)
-
-            when (resource) {
+    fun execute(expression: String): Flow<Pair<List<Track>?, String?>> {
+        return trackRepository.getTracks(expression).map { result ->
+            when (result) {
                 is Resource.Success -> {
-                    consumer.consume(ConsumerData.Data(resource.data))
+                    Pair(result.data, null)
                 }
-
                 is Resource.Error -> {
-                    consumer.consume(ConsumerData.Error(resource.message))
+                    Pair(null, result.message)
                 }
             }
         }
