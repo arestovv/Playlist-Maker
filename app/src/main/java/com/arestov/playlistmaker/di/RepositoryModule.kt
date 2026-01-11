@@ -1,11 +1,14 @@
 package com.arestov.playlistmaker.di
 
 import android.content.SharedPreferences
+import com.arestov.playlistmaker.data.converters.TrackDbConvertor
 import com.arestov.playlistmaker.data.repository.ExternalNavigationRepositoryImpl
+import com.arestov.playlistmaker.data.repository.FavoriteRepositoryImpl
 import com.arestov.playlistmaker.data.repository.PreferencesStorageRepositoryImpl
 import com.arestov.playlistmaker.data.repository.ThemeRepositoryImpl
 import com.arestov.playlistmaker.data.search.repository.TrackHistoryRepositoryImpl
 import com.arestov.playlistmaker.data.search.repository.TrackRepositoryImpl
+import com.arestov.playlistmaker.domain.repository.FavoriteRepository
 import com.arestov.playlistmaker.domain.repository.ExternalNavigationRepository
 import com.arestov.playlistmaker.domain.repository.PreferencesStorageRepository
 import com.arestov.playlistmaker.domain.repository.ThemeRepository
@@ -31,7 +34,7 @@ val repositoryModule = module {
 
     // TrackRepository
     factory<TrackRepository> {
-        TrackRepositoryImpl(get())
+        TrackRepositoryImpl(get(), get())
     }
 
     // ExternalNavigationRepository
@@ -46,5 +49,11 @@ val repositoryModule = module {
 
     single<ThemeRepository> {
         ThemeRepositoryImpl(get(named(SWITCHER_DARK_THEME_STATE_KEY)), get())
+    }
+
+    factory { TrackDbConvertor() }
+
+    single<FavoriteRepository> {
+        FavoriteRepositoryImpl(get(), get())
     }
 }

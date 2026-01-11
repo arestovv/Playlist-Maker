@@ -59,6 +59,7 @@ class PlayerFragment : Fragment() {
             valueDuration.text = track.trackTimeSeconds
             valueGenre.text = track.primaryGenreName
             valueCountry.text = track.country
+            if (track.isFavorite) binding.buttonAddToFavorite.setImageResource(R.drawable.ic_button_added_to_favorite)
         }
 
         //Show album name
@@ -76,6 +77,19 @@ class PlayerFragment : Fragment() {
         //Play/pause track
         binding.buttonPlay.setOnClickListener {
             viewModel.onPlayButtonClicked()
+        }
+
+        //Favorite track listener
+        viewModel.favoriteLiveData.observe(viewLifecycleOwner) { isFavorite ->
+            if (isFavorite) {
+                binding.buttonAddToFavorite.setImageResource(R.drawable.ic_button_added_to_favorite)
+            } else {
+                binding.buttonAddToFavorite.setImageResource(R.drawable.ic_button_add_to_favorite)
+            }
+        }
+
+        binding.buttonAddToFavorite.setOnClickListener {
+            viewModel.onFavoriteClicked(track)
         }
     }
 

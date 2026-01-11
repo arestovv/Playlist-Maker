@@ -119,6 +119,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun showHistory(tracks: List<Track>) {
+        viewModel.setFavorite(tracks)
         historyAdapter.updateData(tracks)
         binding.apply {
             historyContainer.isVisible = true
@@ -148,11 +149,14 @@ class SearchFragment : Fragment() {
             trackRecyclerView.isGone = true
             infoContainer.isGone = true
             infoContainerButton.isGone = true
+            historyContainer.isGone = true
+            historyRecyclerView.isGone = true
             progressBar.isVisible = true
         }
     }
 
     private fun showTracks(tracks: List<Track>) {
+        viewModel.setFavorite(tracks)
         trackAdapter.updateData(tracks)
         binding.apply {
             trackRecyclerView.isVisible = true

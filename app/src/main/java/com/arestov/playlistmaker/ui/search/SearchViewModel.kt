@@ -6,17 +6,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
 import com.arestov.playlistmaker.domain.search.model.Track
+import com.arestov.playlistmaker.domain.search.repository.TrackRepository
 import com.arestov.playlistmaker.domain.search.usecases.GetTrackListUseCase
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val getTrackListUseCase: GetTrackListUseCase,
-    private val getTrackHistoryInteractor: GetTrackHistoryInteractor
+    private val getTrackHistoryInteractor: GetTrackHistoryInteractor,
+    private val trackRepository: TrackRepository
 ) : ViewModel() {
 
     private val screenState = MutableLiveData<SearchScreenState>()
@@ -30,12 +29,9 @@ class SearchViewModel(
     }
 
     fun loadHistory() {
-        if (getTrackHistoryInteractor.getTracks().isNotEmpty()) {
-            screenState.postValue(
-                SearchScreenState.HistoryContent(
-                    historyTracks = getTrackHistoryInteractor.getTracks()
-                )
-            )
+        val tracks = getTrackHistoryInteractor.getTracks()
+        if (tracks.isNotEmpty()) {
+            screenState.postValue(SearchScreenState.HistoryContent(historyTracks = tracks))
         } else {
             screenState.postValue(SearchScreenState.EmptyHistory)
         }
@@ -63,6 +59,12 @@ class SearchViewModel(
         }
     }
 
+    fun setFavorite(tracks: List<Track>) {
+        viewModelScope.launch {
+            trackRepository.setFavorite(tracks)
+        }
+    }
+
     fun searchTracks(searchText: String) {
         if (searchText == previousText) return
 
@@ -70,7 +72,6 @@ class SearchViewModel(
         previousText = searchText
         viewModelScope.launch {
             getTrackListUseCase.execute(searchText)
-                .flowOn(Dispatchers.IO)
                 .collect { (tracks, error) ->
                     val newState = when {
                         error != null -> SearchScreenState.NetworkError
