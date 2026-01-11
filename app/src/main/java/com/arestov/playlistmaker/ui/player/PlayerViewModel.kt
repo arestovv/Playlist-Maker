@@ -1,13 +1,15 @@
 package com.arestov.playlistmaker.ui.player
 
 import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
 import com.arestov.playlistmaker.domain.search.model.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -16,16 +18,12 @@ class PlayerViewModel(
     private val mediaPlayer: MediaPlayer
 ) : ViewModel() {
 
+    private var timerJob: Job? = null
+
     private val playerStateMutableLiveData = MutableLiveData<PlayerState>(
         PlayerState.Default(progress = DEFAULT_TIMER)
     )
     val playerStateLiveData: LiveData<PlayerState> = playerStateMutableLiveData
-    private val handler = Handler(Looper.getMainLooper())
-    private val timerRunnable = Runnable {
-        if (playerStateMutableLiveData.value is PlayerState.Playing) {
-            startTimerUpdate()
-        }
-    }
 
     init {
         preparePlayer()
@@ -52,52 +50,46 @@ class PlayerViewModel(
         mediaPlayer.setDataSource(getTrack().previewUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            playerStateMutableLiveData.postValue(
-                PlayerState.Prepared(progress = DEFAULT_TIMER)
-            )
+            setPlayerState(PlayerState.Prepared(progress = DEFAULT_TIMER))
         }
 
         mediaPlayer.setOnCompletionListener {
-            playerStateMutableLiveData.postValue(
-                PlayerState.Prepared(progress = DEFAULT_TIMER)
-            )
+            setPlayerState(PlayerState.Prepared(progress = DEFAULT_TIMER))
             resetTimer()
         }
     }
 
     private fun startPlayer() {
         //reset timer after play to the end track
-        if (playerStateMutableLiveData.value is PlayerState.Default) {
+        if (getPlayerState() is PlayerState.Default) {
             mediaPlayer.seekTo(0)
         }
         mediaPlayer.start()
-        playerStateMutableLiveData.postValue(
-            PlayerState.Playing(progress = getCurrentFormattedTime())
-        )
+        setPlayerState(PlayerState.Playing(progress = getCurrentFormattedTime()))
         startTimerUpdate()
     }
 
     private fun pausePlayer() {
         pauseTimer()
         mediaPlayer.pause()
-        playerStateMutableLiveData.postValue(
-            PlayerState.Paused(progress = getCurrentFormattedTime())
-        )
+        setPlayerState(PlayerState.Paused(progress = getCurrentFormattedTime()))
     }
 
     private fun startTimerUpdate() {
-        playerStateMutableLiveData.postValue(
-            PlayerState.Playing(progress = getCurrentFormattedTime())
-        )
-        handler.postDelayed(timerRunnable, 200)
+        timerJob = viewModelScope.launch {
+            while (mediaPlayer.isPlaying) {
+                setPlayerState(PlayerState.Playing(progress = getCurrentFormattedTime()))
+                delay(DELAY_TIME)
+            }
+        }
     }
 
     private fun pauseTimer() {
-        handler.removeCallbacks(timerRunnable)
+        timerJob?.cancel()
     }
 
     private fun resetTimer() {
-        handler.removeCallbacks(timerRunnable)
+        timerJob?.cancel()
         playerStateMutableLiveData.postValue(
             PlayerState.Default(progress = DEFAULT_TIMER)
         )
@@ -111,7 +103,16 @@ class PlayerViewModel(
         pausePlayer()
     }
 
+    private fun getPlayerState(): PlayerState? {
+        return playerStateMutableLiveData.value
+    }
+
+    private fun setPlayerState(playerState: PlayerState) {
+        playerStateMutableLiveData.postValue(playerState)
+    }
+
     companion object {
         const val DEFAULT_TIMER = "00:00"
+        const val DELAY_TIME = 300L
     }
 }
