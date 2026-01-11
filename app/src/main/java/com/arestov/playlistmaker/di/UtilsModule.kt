@@ -8,7 +8,7 @@ import org.koin.dsl.module
 val utilsModule = module {
 
     single<ResourceManager> {
-        ResourceManager( androidContext())
+        ResourceManager( context = androidContext())
     }
 
     factory { Gson() }

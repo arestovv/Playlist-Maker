@@ -11,22 +11,38 @@ import org.koin.dsl.module
 val viewModelModule = module {
 
     viewModel {
-        RootViewModel(get())
+        RootViewModel(themeRepository = get())
     }
 
     viewModel {
-        MediaViewModel(get(), get(), get())
+        MediaViewModel(
+            favoriteRepository = get(),
+            trackRepository = get(),
+            historyInteractor = get()
+        )
     }
 
     viewModel {
-        PlayerViewModel(get(), get(), get())
+        PlayerViewModel(
+            historyInteractor = get(),
+            favoriteInteractor = get(),
+            mediaPlayer = get()
+        )
     }
 
     viewModel {
-        SearchViewModel(get(), get(), get())
+        SearchViewModel(
+            getTrackListUseCase = get(),
+            getTrackHistoryInteractor = get(),
+            trackRepository = get()
+        )
     }
 
     viewModel {
-        SettingsViewModel(get(), get(), get())
+        SettingsViewModel(
+            navigationInteractor = get(),
+            themeInteractor = get(),
+            resourceManager = get()
+        )
     }
 }

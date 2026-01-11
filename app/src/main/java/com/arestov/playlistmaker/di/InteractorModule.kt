@@ -12,18 +12,18 @@ import org.koin.dsl.module
 val interactorModule = module {
 
     factory<ExternalNavigationInteractor> {
-        ExternalNavigationInteractorImpl(get())
+        ExternalNavigationInteractorImpl(repository = get())
     }
 
     single<GetTrackHistoryInteractor> {
-        GetTrackHistoryInteractor(get())
+        GetTrackHistoryInteractor(trackHistoryRepository = get())
     }
 
     single<ThemeInteractor> {
-        ThemeInteractorImpl(get())
+        ThemeInteractorImpl(themeRepository = get())
     }
 
     single<FavoriteInteractor> {
-        FavoriteInteractorImpl(get())
+        FavoriteInteractorImpl(favoriteRepository = get())
     }
 }
