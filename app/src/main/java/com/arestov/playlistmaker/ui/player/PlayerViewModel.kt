@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arestov.playlistmaker.domain.interactor.FavoriteInteractor
 import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
 import com.arestov.playlistmaker.domain.search.model.Track
 import kotlinx.coroutines.Job
@@ -15,6 +16,7 @@ import java.util.Locale
 
 class PlayerViewModel(
     private val historyInteractor: GetTrackHistoryInteractor,
+    private val favoriteInteractor: FavoriteInteractor,
     private val mediaPlayer: MediaPlayer
 ) : ViewModel() {
 
@@ -24,6 +26,9 @@ class PlayerViewModel(
         PlayerState.Default(progress = DEFAULT_TIMER)
     )
     val playerStateLiveData: LiveData<PlayerState> = playerStateMutableLiveData
+
+    private val favoriteMutableLiveData = MutableLiveData<Boolean>()
+    val favoriteLiveData: LiveData<Boolean> = favoriteMutableLiveData
 
     init {
         preparePlayer()
@@ -39,6 +44,19 @@ class PlayerViewModel(
         when (playerStateLiveData.value) {
             is PlayerState.Playing -> pausePlayer()
             else -> startPlayer()
+        }
+    }
+
+    fun onFavoriteClicked(track: Track) {
+        viewModelScope.launch {
+            if (track.isFavorite) {
+                favoriteInteractor.deleteFavoriteTrack(track)
+                track.isFavorite = false
+            } else {
+                favoriteInteractor.addFavoriteTrack(track)
+                track.isFavorite = true
+            }
+            favoriteMutableLiveData.postValue(track.isFavorite)
         }
     }
 
@@ -76,6 +94,7 @@ class PlayerViewModel(
     }
 
     private fun startTimerUpdate() {
+        timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (mediaPlayer.isPlaying) {
                 setPlayerState(PlayerState.Playing(progress = getCurrentFormattedTime()))
