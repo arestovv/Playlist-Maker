@@ -1,8 +1,10 @@
 package com.arestov.playlistmaker.di
 
-import TrackRetrofitNetworkClient
+import com.arestov.playlistmaker.data.search.network.TrackRetrofitNetworkClient
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.room.Room
+import com.arestov.playlistmaker.data.db.AppDatabase
 import com.arestov.playlistmaker.data.provider.SystemThemeProviderImpl
 import com.arestov.playlistmaker.data.search.network.RetrofitClient
 import com.arestov.playlistmaker.data.search.network.TrackNetworkClient
@@ -22,9 +24,19 @@ val dataModule = module {
         SystemThemeProviderImpl(androidContext())
     }
 
-    single { RetrofitClient.api }
+    single {
+        RetrofitClient.api
+    }
 
     single<TrackNetworkClient> {
         TrackRetrofitNetworkClient(get())
+    }
+
+    single {
+        Room.databaseBuilder(
+            context = androidContext(),
+            klass = AppDatabase::class.java,
+            name = "database.db"
+        ).build()
     }
 }

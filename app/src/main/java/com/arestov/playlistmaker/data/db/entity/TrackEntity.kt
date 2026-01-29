@@ -1,6 +1,11 @@
-package com.arestov.playlistmaker.domain.search.model
+package com.arestov.playlistmaker.data.db.entity
 
-data class Track(
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "track_table")
+data class TrackEntity(
+    @PrimaryKey
     val trackId: Long,
     val trackName: String,
     val artistName: String,
@@ -12,14 +17,5 @@ data class Track(
     val primaryGenreName: String,
     val country: String,
     val previewUrl: String,
-    var isFavorite: Boolean = false
-) {
-
-    override fun equals(other: Any?): Boolean {
-        return other is Track && this.trackId == other.trackId
-    }
-
-    override fun hashCode(): Int {
-        return trackId.hashCode()
-    }
-}
+    val createdAt: Long = System.currentTimeMillis()
+)

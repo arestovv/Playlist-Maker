@@ -35,7 +35,7 @@ class SettingsFragment : Fragment() {
             ThemeManager.setDarkMode(state = state)
         }
 
-        binding.switcherTheme.setOnCheckedChangeListener { switcher, checked ->
+        binding.switcherTheme.setOnCheckedChangeListener { _, checked ->
             viewModel.setDarkThemeEnabled(checked)
         }
 

@@ -6,6 +6,6 @@ import org.koin.dsl.module
 val useCaseModule = module {
 
     factory<GetTrackListUseCase> {
-        GetTrackListUseCase(get())
+        GetTrackListUseCase(trackRepository = get())
     }
 }
