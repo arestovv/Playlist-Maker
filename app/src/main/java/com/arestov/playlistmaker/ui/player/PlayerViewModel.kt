@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arestov.playlistmaker.domain.interactor.FavoriteInteractor
+import com.arestov.playlistmaker.domain.interactor.PlaylistInteractor
 import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
+import com.arestov.playlistmaker.domain.search.model.Playlist
 import com.arestov.playlistmaker.domain.search.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -17,21 +19,24 @@ import java.util.Locale
 class PlayerViewModel(
     private val historyInteractor: GetTrackHistoryInteractor,
     private val favoriteInteractor: FavoriteInteractor,
+    private val playlistInteractor: PlaylistInteractor,
     private val mediaPlayer: MediaPlayer
 ) : ViewModel() {
 
     private var timerJob: Job? = null
 
-    private val playerStateMutableLiveData = MutableLiveData<PlayerState>(
-        PlayerState.Default(progress = DEFAULT_TIMER)
+    private val playerStateProgressMutableLiveData = MutableLiveData<PlayerStateProgress>(
+        PlayerStateProgress.Default(progress = DEFAULT_TIMER)
     )
-    val playerStateLiveData: LiveData<PlayerState> = playerStateMutableLiveData
+    val playerStateProgressLiveData: LiveData<PlayerStateProgress> =
+        playerStateProgressMutableLiveData
 
-    private val favoriteMutableLiveData = MutableLiveData<Boolean>()
-    val favoriteLiveData: LiveData<Boolean> = favoriteMutableLiveData
+    private val stateScreenMutableLiveData = MutableLiveData<PlayerScreenState>()
+    val stateScreenLiveData: LiveData<PlayerScreenState> = stateScreenMutableLiveData
 
     init {
         preparePlayer()
+        observePlaylists()
     }
 
     override fun onCleared() {
@@ -41,8 +46,8 @@ class PlayerViewModel(
     }
 
     fun onPlayButtonClicked() {
-        when (playerStateLiveData.value) {
-            is PlayerState.Playing -> pausePlayer()
+        when (playerStateProgressLiveData.value) {
+            is PlayerStateProgress.Playing -> pausePlayer()
             else -> startPlayer()
         }
     }
@@ -56,7 +61,7 @@ class PlayerViewModel(
                 favoriteInteractor.addFavoriteTrack(track)
                 track.isFavorite = true
             }
-            favoriteMutableLiveData.postValue(track.isFavorite)
+            stateScreenMutableLiveData.postValue(PlayerScreenState.Favorite(track.isFavorite))
         }
     }
 
@@ -68,36 +73,36 @@ class PlayerViewModel(
         mediaPlayer.setDataSource(getTrack().previewUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            setPlayerState(PlayerState.Prepared(progress = DEFAULT_TIMER))
+            setPlayerState(PlayerStateProgress.Prepared(progress = DEFAULT_TIMER))
         }
 
         mediaPlayer.setOnCompletionListener {
-            setPlayerState(PlayerState.Prepared(progress = DEFAULT_TIMER))
+            setPlayerState(PlayerStateProgress.Prepared(progress = DEFAULT_TIMER))
             resetTimer()
         }
     }
 
     private fun startPlayer() {
         //reset timer after play to the end track
-        if (getPlayerState() is PlayerState.Default) {
+        if (getPlayerState() is PlayerStateProgress.Default) {
             mediaPlayer.seekTo(0)
         }
         mediaPlayer.start()
-        setPlayerState(PlayerState.Playing(progress = getCurrentFormattedTime()))
+        setPlayerState(PlayerStateProgress.Playing(progress = getCurrentFormattedTime()))
         startTimerUpdate()
     }
 
     private fun pausePlayer() {
         pauseTimer()
         mediaPlayer.pause()
-        setPlayerState(PlayerState.Paused(progress = getCurrentFormattedTime()))
+        setPlayerState(PlayerStateProgress.Paused(progress = getCurrentFormattedTime()))
     }
 
     private fun startTimerUpdate() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (mediaPlayer.isPlaying) {
-                setPlayerState(PlayerState.Playing(progress = getCurrentFormattedTime()))
+                setPlayerState(PlayerStateProgress.Playing(progress = getCurrentFormattedTime()))
                 delay(DELAY_TIME)
             }
         }
@@ -109,8 +114,8 @@ class PlayerViewModel(
 
     private fun resetTimer() {
         timerJob?.cancel()
-        playerStateMutableLiveData.postValue(
-            PlayerState.Default(progress = DEFAULT_TIMER)
+        playerStateProgressMutableLiveData.postValue(
+            PlayerStateProgress.Default(progress = DEFAULT_TIMER)
         )
     }
 
@@ -122,12 +127,41 @@ class PlayerViewModel(
         pausePlayer()
     }
 
-    private fun getPlayerState(): PlayerState? {
-        return playerStateMutableLiveData.value
+    private fun getPlayerState(): PlayerStateProgress? {
+        return playerStateProgressMutableLiveData.value
     }
 
-    private fun setPlayerState(playerState: PlayerState) {
-        playerStateMutableLiveData.postValue(playerState)
+    private fun setPlayerState(playerStateProgress: PlayerStateProgress) {
+        playerStateProgressMutableLiveData.postValue(playerStateProgress)
+    }
+
+    private fun observePlaylists() {
+        viewModelScope.launch {
+            playlistInteractor.getPlaylist()
+                .collect { playlists ->
+                    if (playlists.isEmpty()) {
+                        stateScreenMutableLiveData.value = PlayerScreenState.Empty
+                    } else {
+                        stateScreenMutableLiveData.value = PlayerScreenState.Content(playlists)
+                    }
+                }
+        }
+    }
+
+    fun addTrackToPlaylist(playlist: Playlist, track: Track) {
+        viewModelScope.launch {
+            if (!playlistInteractor.hasPlaylistTrack(playlist.id, track.trackId)) {
+                playlistInteractor.addPlaylistTrack(playlist.id, track)
+                stateScreenMutableLiveData.postValue(
+                    PlayerScreenState.TrackAddedToPlaylist(playlist, true)
+                )
+            } else {
+                stateScreenMutableLiveData.postValue(
+                    PlayerScreenState.TrackAddedToPlaylist(playlist, false)
+                )
+            }
+
+        }
     }
 
     companion object {

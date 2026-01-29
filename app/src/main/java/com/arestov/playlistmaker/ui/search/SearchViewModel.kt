@@ -24,7 +24,7 @@ class SearchViewModel(
     private var previousText = ""
     private var searchJob: Job? = null
 
-    init {
+    fun start() {
         loadHistory()
     }
 

@@ -1,15 +1,18 @@
 package com.arestov.playlistmaker.di
 
 import android.content.SharedPreferences
+import com.arestov.playlistmaker.data.converters.PlaylistDbConvertor
 import com.arestov.playlistmaker.data.converters.TrackDbConvertor
 import com.arestov.playlistmaker.data.repository.ExternalNavigationRepositoryImpl
 import com.arestov.playlistmaker.data.repository.FavoriteRepositoryImpl
+import com.arestov.playlistmaker.data.repository.PlaylistRepositoryImpl
 import com.arestov.playlistmaker.data.repository.PreferencesStorageRepositoryImpl
 import com.arestov.playlistmaker.data.repository.ThemeRepositoryImpl
 import com.arestov.playlistmaker.data.search.repository.TrackHistoryRepositoryImpl
 import com.arestov.playlistmaker.data.search.repository.TrackRepositoryImpl
 import com.arestov.playlistmaker.domain.repository.FavoriteRepository
 import com.arestov.playlistmaker.domain.repository.ExternalNavigationRepository
+import com.arestov.playlistmaker.domain.repository.PlaylistRepository
 import com.arestov.playlistmaker.domain.repository.PreferencesStorageRepository
 import com.arestov.playlistmaker.domain.repository.ThemeRepository
 import com.arestov.playlistmaker.domain.search.repository.TrackHistoryRepository
@@ -55,5 +58,11 @@ val repositoryModule = module {
 
     single<FavoriteRepository> {
         FavoriteRepositoryImpl(get(), get())
+    }
+
+    factory { PlaylistDbConvertor() }
+
+    single<PlaylistRepository> {
+        PlaylistRepositoryImpl(get(), get(), get(), get())
     }
 }
