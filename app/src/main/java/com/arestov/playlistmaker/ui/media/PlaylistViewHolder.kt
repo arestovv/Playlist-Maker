@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.domain.search.model.Playlist
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.io.File
 
 class PlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -22,7 +24,7 @@ class PlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             .load(Uri.fromFile(file))
             .placeholder(R.drawable.ic_album_placeholder)
             .error(R.drawable.ic_album_placeholder)
-            .centerCrop()
+            .transform(CenterCrop(), RoundedCorners(8))
             .into(image)
 
         name.text = playlist.name
