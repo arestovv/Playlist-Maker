@@ -11,9 +11,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arestov.playlistmaker.domain.interactor.PlaylistInteractor
 import com.arestov.playlistmaker.domain.search.model.Playlist
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
+
+private const val IMAGE_QUALITY = 30
+private const val ALBUM_DIR = "myalbum"
 
 class CreatePlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
@@ -32,16 +36,23 @@ class CreatePlaylistViewModel(
 
     //Сохранение картинки в память
     fun saveImageToPrivateStorage(context: Context, uri: Uri) {
-        val filePath = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
-        if (!filePath.exists()) filePath.mkdirs()
+        viewModelScope.launch(Dispatchers.IO) {
+            val dir = File(
+                context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                ALBUM_DIR
+            )
+            if (!dir.exists()) dir.mkdirs()
 
-        val file = File(filePath, "playlist_${System.currentTimeMillis()}.jpg")
+            val file = File(dir, "playlist_${System.currentTimeMillis()}.jpg")
 
-        context.contentResolver.openInputStream(uri).use { input ->
-            FileOutputStream(file).use { output ->
-                BitmapFactory.decodeStream(input).compress(Bitmap.CompressFormat.JPEG, 30, output)
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(file).use { output ->
+                    BitmapFactory.decodeStream(input)
+                        .compress(Bitmap.CompressFormat.JPEG, IMAGE_QUALITY, output)
+                }
             }
+
+            _imagePath.postValue(file.absolutePath)
         }
-        _imagePath.postValue(file.absolutePath)
     }
 }

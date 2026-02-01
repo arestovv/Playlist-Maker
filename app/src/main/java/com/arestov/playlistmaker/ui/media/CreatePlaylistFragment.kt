@@ -26,8 +26,6 @@ class CreatePlaylistFragment : Fragment() {
     private var _binding: FragmentCreatePlaylistBinding? = null
     private val binding get() = _binding!!
     private var imageUri: String = ""
-    lateinit var confirmDialog: MaterialAlertDialogBuilder
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,8 +38,6 @@ class CreatePlaylistFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        confirmDialog = createPopupNeedToSave()
 
         //сохраняем путь до картинки для передачи в БД при создании плейлиста
         viewModel.imagePathLiveData.observe(viewLifecycleOwner) { path ->
@@ -115,9 +111,8 @@ class CreatePlaylistFragment : Fragment() {
         val descriptionNotEmpty = binding.descriptionPlaylistInput.text.toString().isNotEmpty()
         val imageNotEmpty = imageUri.isNotEmpty()
 
-        //Если какой-то поле заполнено показываем confirmDialog
         if (imageNotEmpty || nameNotEmpty || descriptionNotEmpty) {
-            confirmDialog.show()
+            createPopupNeedToSave().show()
         } else {
             findNavController().navigateUp()
         }

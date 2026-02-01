@@ -52,6 +52,7 @@ class SearchViewModel(
         searchJob = viewModelScope.launch {
             if (searchText.isBlank()) {
                 loadHistory()
+                previousText = ""
                 return@launch
             }
             delay(SEARCH_DEBOUNCE_DELAY)
