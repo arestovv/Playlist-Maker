@@ -2,9 +2,11 @@ package com.arestov.playlistmaker.di
 
 import com.arestov.playlistmaker.domain.interactor.ExternalNavigationInteractor
 import com.arestov.playlistmaker.domain.interactor.FavoriteInteractor
+import com.arestov.playlistmaker.domain.interactor.PlaylistInteractor
 import com.arestov.playlistmaker.domain.interactor.ThemeInteractor
 import com.arestov.playlistmaker.domain.interactor.impl.ExternalNavigationInteractorImpl
 import com.arestov.playlistmaker.domain.interactor.impl.FavoriteInteractorImpl
+import com.arestov.playlistmaker.domain.interactor.impl.PlaylistInteractorImpl
 import com.arestov.playlistmaker.domain.interactor.impl.ThemeInteractorImpl
 import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryInteractor
 import org.koin.dsl.module
@@ -15,15 +17,19 @@ val interactorModule = module {
         ExternalNavigationInteractorImpl(repository = get())
     }
 
-    single<GetTrackHistoryInteractor> {
+    factory<GetTrackHistoryInteractor> {
         GetTrackHistoryInteractor(trackHistoryRepository = get())
     }
 
-    single<ThemeInteractor> {
+    factory<ThemeInteractor> {
         ThemeInteractorImpl(themeRepository = get())
     }
 
-    single<FavoriteInteractor> {
+    factory<FavoriteInteractor> {
         FavoriteInteractorImpl(favoriteRepository = get())
+    }
+
+    factory<PlaylistInteractor> {
+        PlaylistInteractorImpl(playlistRepository = get())
     }
 }

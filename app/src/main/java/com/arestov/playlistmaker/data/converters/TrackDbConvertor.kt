@@ -1,5 +1,6 @@
 package com.arestov.playlistmaker.data.converters
 
+import com.arestov.playlistmaker.data.db.entity.PlaylistTrackEntity
 import com.arestov.playlistmaker.data.db.entity.TrackEntity
 import com.arestov.playlistmaker.domain.search.model.Track
 
@@ -35,6 +36,23 @@ class TrackDbConvertor {
             primaryGenreName = entity.primaryGenreName,
             country = entity.country,
             previewUrl = entity.previewUrl
+        )
+    }
+
+    // Track -> PlaylistTrackEntity
+    fun mapToPlaylistTrackEntity(track: Track): PlaylistTrackEntity {
+        return PlaylistTrackEntity(
+            trackId = track.trackId,
+            trackName = track.trackName,
+            artistName = track.artistName,
+            trackTimeSeconds = track.trackTimeSeconds,
+            artworkUrl100 = track.artworkUrl100,
+            artworkUrl512 = track.artworkUrl512,
+            collectionName = track.collectionName,
+            releaseYear = track.releaseYear,
+            primaryGenreName = track.primaryGenreName,
+            country = track.country,
+            previewUrl = track.previewUrl
         )
     }
 }

@@ -2,6 +2,7 @@
 <resources>
 
     <color name="text_color">@color/yp_black</color>
+    <color name="text_color_revers">@color/yp_white</color>
 
     <!--Main-->
     <color name="text_color_title_main_screen">@color/yp_white</color>
@@ -32,10 +33,15 @@
     <color name="background_media_screen">@color/yp_white</color>
     <color name="tab_indicator_color">@color/yp_black</color>
     <color name="color_buttons_media_screen">@color/yp_black</color>
+    <color name="color_playlist_count_track">@color/yp_gray</color>
+    <color name="color_box_stroke">@color/yp_gray</color>
 
     <!--Root-->
     <color name="bottom_navigation">@color/yp_white</color>
     <color name="bottom_navigation_top_strip">@color/yp_light_gray</color>
+
+    <!--Toast-->
+    <color name="toast_background">@color/yp_black</color>
 
     <!--Colors-->
     <color name="yp_white">#FFFFFF</color>

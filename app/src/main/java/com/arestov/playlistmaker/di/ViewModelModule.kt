@@ -1,6 +1,8 @@
 package com.arestov.playlistmaker.di
 
+import com.arestov.playlistmaker.ui.media.CreatePlaylistViewModel
 import com.arestov.playlistmaker.ui.media.MediaViewModel
+import com.arestov.playlistmaker.ui.media.PlaylistViewModel
 import com.arestov.playlistmaker.ui.player.PlayerViewModel
 import com.arestov.playlistmaker.ui.root.RootViewModel
 import com.arestov.playlistmaker.ui.search.SearchViewModel
@@ -26,6 +28,7 @@ val viewModelModule = module {
         PlayerViewModel(
             historyInteractor = get(),
             favoriteInteractor = get(),
+            playlistInteractor = get(),
             mediaPlayer = get()
         )
     }
@@ -43,6 +46,18 @@ val viewModelModule = module {
             navigationInteractor = get(),
             themeInteractor = get(),
             resourceManager = get()
+        )
+    }
+
+    viewModel {
+        PlaylistViewModel(
+            playlistInteractor = get()
+        )
+    }
+
+    viewModel {
+        CreatePlaylistViewModel(
+            playlistInteractor = get()
         )
     }
 }

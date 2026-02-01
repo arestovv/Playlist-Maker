@@ -30,6 +30,8 @@ class MediaFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.start()
+
         binding.viewPager.adapter = MediaViewPagerAdapter(
             fragmentManager = childFragmentManager,
             lifecycle = lifecycle

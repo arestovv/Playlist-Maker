@@ -19,7 +19,7 @@ class MediaViewModel(
     private val _screenState = MutableLiveData<FavoriteScreenState>()
     val screenStateLiveData: LiveData<FavoriteScreenState> = _screenState
 
-    init {
+    fun start() {
         observeFavoriteTracks()
     }
 

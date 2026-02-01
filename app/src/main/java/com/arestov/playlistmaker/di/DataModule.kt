@@ -4,7 +4,9 @@ import com.arestov.playlistmaker.data.search.network.TrackRetrofitNetworkClient
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
-import com.arestov.playlistmaker.data.db.AppDatabase
+import com.arestov.playlistmaker.data.db.PlaylistDatabase
+import com.arestov.playlistmaker.data.db.FavoriteTrackDatabase
+import com.arestov.playlistmaker.data.db.PlaylistTrackDatabase
 import com.arestov.playlistmaker.data.provider.SystemThemeProviderImpl
 import com.arestov.playlistmaker.data.search.network.RetrofitClient
 import com.arestov.playlistmaker.data.search.network.TrackNetworkClient
@@ -35,8 +37,28 @@ val dataModule = module {
     single {
         Room.databaseBuilder(
             context = androidContext(),
-            klass = AppDatabase::class.java,
-            name = "database.db"
+            klass = FavoriteTrackDatabase::class.java,
+            name = "track_database.db"
         ).build()
     }
+
+    single {
+        Room.databaseBuilder(
+            context = androidContext(),
+            klass = PlaylistDatabase::class.java,
+            name = "playlist_database.db"
+        ).build()
+    }
+
+    single {
+        Room.databaseBuilder(
+            context = androidContext(),
+            klass = PlaylistTrackDatabase::class.java,
+            name = "playlist_track_table.db"
+        ).build()
+    }
+    single { get<FavoriteTrackDatabase>().trackDao() }
+    single { get<PlaylistDatabase>().playlistDao() }
+    single { get<PlaylistTrackDatabase>().playlistTrackDao() }
+
 }
