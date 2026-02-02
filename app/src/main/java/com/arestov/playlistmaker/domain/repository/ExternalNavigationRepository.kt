@@ -6,5 +6,5 @@ interface ExternalNavigationRepository  {
     fun shareApp(shareAppLink: String)
     fun openTerms(termsLink: String)
     fun openSupport(supportEmailData: EmailData)
-
+    fun sharePlaylist(shareText: String)
 }

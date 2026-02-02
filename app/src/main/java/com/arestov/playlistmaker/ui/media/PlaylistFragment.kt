@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.databinding.FragmentPlaylistBinding
 import com.arestov.playlistmaker.domain.search.model.Playlist
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -54,7 +53,7 @@ class PlaylistFragment : Fragment() {
             data = emptyList(),
             coroutineScope = viewLifecycleOwner.lifecycleScope
         ) { playlist ->
-            //TODO клик по playlist
+            launchPlaylistInfoFragment(playlist.id)
         }
 
         binding.playlistRecyclerView.apply {
@@ -100,6 +99,13 @@ class PlaylistFragment : Fragment() {
     }
 
     private fun launchCreatePlaylistFragment() {
-        findNavController().navigate(R.id.action_mediaFragment_to_createPlaylistFragment)
+        val action =
+            MediaFragmentDirections.actionMediaFragmentToCreatePlaylistFragment(-1)
+        findNavController().navigate(action)
+    }
+
+    private fun launchPlaylistInfoFragment(id: Int) {
+        val action = MediaFragmentDirections.actionMediaFragmentToPlaylistInfoFragment(id)
+        findNavController().navigate(action)
     }
 }

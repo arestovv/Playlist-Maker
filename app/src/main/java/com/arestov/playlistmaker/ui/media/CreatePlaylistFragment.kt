@@ -11,12 +11,17 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.databinding.FragmentCreatePlaylistBinding
+import com.arestov.playlistmaker.domain.search.model.Playlist
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
@@ -25,6 +30,7 @@ class CreatePlaylistFragment : Fragment() {
     private val viewModel: CreatePlaylistViewModel by viewModel()
     private var _binding: FragmentCreatePlaylistBinding? = null
     private val binding get() = _binding!!
+    private val args: CreatePlaylistFragmentArgs by navArgs()
     private var imageUri: String = ""
 
     override fun onCreateView(
@@ -39,9 +45,23 @@ class CreatePlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val playlistId = args.playlistId
+        val flagUpdate = playlistId != -1
+
+        if (flagUpdate) viewModel.setPlaylist(playlistId)
+
         //сохраняем путь до картинки для передачи в БД при создании плейлиста
-        viewModel.imagePathLiveData.observe(viewLifecycleOwner) { path ->
-            imageUri = path
+        viewModel.stateScreenLiveData.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is CreatePlaylistScreenState.Playlist -> {
+                    showPlaylistDate(state.playlist)
+                }
+
+                is CreatePlaylistScreenState.ImagePath -> {
+                    imageUri = state.path
+                }
+            }
+
         }
 
         //Загрузка картинки из памяти
@@ -67,21 +87,46 @@ class CreatePlaylistFragment : Fragment() {
 
         //Back
         binding.toolbarCreatePlaylistScreen.setNavigationOnClickListener {
-            showPopupNeedToSave()
+            if (!flagUpdate) {
+                showPopupNeedToSave()
+            } else {
+                findNavController().navigateUp()
+            }
         }
 
         //System back
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            showPopupNeedToSave()
+            if (!flagUpdate) {
+                showPopupNeedToSave()
+            } else {
+                findNavController().navigateUp()
+            }
         }
 
         //Click button create playlist
         binding.createPlaylistButton.setOnClickListener {
             val name = binding.namePlaylistInput.text.toString()
             val descriptor = binding.descriptionPlaylistInput.text.toString()
-            viewModel.addPlaylist(name, descriptor, imageUri)
-            showToast()
-            findNavController().navigateUp()
+
+            if (flagUpdate) {
+                viewModel.viewModelScope.launch {
+                    viewModel.updatePlaylist(playlistId, name, descriptor, imageUri)
+                    findNavController().navigateUp()
+                }
+            } else {
+                viewModel.addPlaylist(name, descriptor, imageUri)
+                showToast()
+                findNavController().navigateUp()
+            }
+        }
+    }
+
+    private fun showPlaylistDate(playlist: Playlist) {
+        binding.apply {
+            pickerImage.setImageURI(playlist.imageUri.toUri())
+            namePlaylistInput.setText(playlist.name)
+            descriptionPlaylistInput.setText(playlist.description)
+            createPlaylistButton.setText("Update")
         }
     }
 

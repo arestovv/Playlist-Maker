@@ -35,6 +35,8 @@
     <color name="color_buttons_media_screen">@color/yp_black</color>
     <color name="color_playlist_count_track">@color/yp_gray</color>
     <color name="color_box_stroke">@color/yp_gray</color>
+    <color name="background_playlist_info">@color/yp_light_gray</color>
+
 
     <!--Root-->
     <color name="bottom_navigation">@color/yp_white</color>

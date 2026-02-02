@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     kotlin("kapt")
+    id("androidx.navigation.safeargs.kotlin") version "2.9.7"
 }
 
 android {

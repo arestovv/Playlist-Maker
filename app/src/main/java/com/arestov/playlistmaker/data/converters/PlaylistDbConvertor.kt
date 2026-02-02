@@ -1,13 +1,12 @@
 package com.arestov.playlistmaker.data.converters
 
-import androidx.core.net.toUri
 import com.arestov.playlistmaker.data.db.entity.PlaylistEntity
 import com.arestov.playlistmaker.domain.search.model.Playlist
 
 class PlaylistDbConvertor {
     fun map(playlist: Playlist): PlaylistEntity {
         return PlaylistEntity(
-            id = 0,
+            id = playlist.id,
             name = playlist.name,
             description = playlist.description,
             imageUri = playlist.imageUri,

@@ -20,7 +20,7 @@ class PlaylistViewModel(
 
     fun observePlaylists() {
         viewModelScope.launch {
-            playlistInteractor.getPlaylist()
+            playlistInteractor.getPlaylists()
                 .collect { playlists ->
                     if (playlists.isEmpty()) {
                         _screenState.value = PlaylistScreenState.Empty
