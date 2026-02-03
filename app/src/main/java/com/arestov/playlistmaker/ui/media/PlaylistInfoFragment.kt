@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +37,8 @@ class PlaylistInfoFragment : Fragment() {
     private lateinit var bottomSheetMenu: BottomSheetBehavior<LinearLayout>
     private val args: PlaylistInfoFragmentArgs by navArgs()
     private var toast: Toast? = null
+    private var currentPlaylist: Playlist? = null
+    private var currentTracks: List<Track> = emptyList()
 
 
     override fun onCreateView(
@@ -100,8 +103,9 @@ class PlaylistInfoFragment : Fragment() {
 
             when (state) {
                 is PlaylistInfoScreenState.Content -> {
+                    currentPlaylist = state.playlist
+                    currentTracks = state.tracks
                     showPlaylistInfo(state.playlist, state.tracks)
-                    updateTrackBottomSheet(state.tracks)
                 }
 
                 is PlaylistInfoScreenState.Toast -> {
@@ -128,16 +132,10 @@ class PlaylistInfoFragment : Fragment() {
                 playlistImage.setImageURI(playlist.imageUri.toUri())
             }
 
-            if (playlist.description.isEmpty()) {
-                playlistDescription.visibility = View.GONE
-            } else {
-                playlistDescription.text = playlist.description
-                playlistDescription.visibility = View.VISIBLE
-            }
+            playlistDescription.text = playlist.description
             playlistImage.scaleType = ImageView.ScaleType.CENTER_CROP
             playlistName.text = playlist.name
             playlistInfo.text = calculateTracks(tracks)
-            updateTrackBottomSheet(tracks)
         }
     }
 
@@ -178,9 +176,9 @@ class PlaylistInfoFragment : Fragment() {
         overlay.alpha = 0f
 
         bottomSheetTracks = BottomSheetBehavior.from(bottomSheetContainer).apply {
-            isFitToContents = true
-            isHideable = true
-            state = BottomSheetBehavior.STATE_HIDDEN
+            isFitToContents = false
+            isHideable = false
+            state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
         lastElement.post {
@@ -191,26 +189,35 @@ class PlaylistInfoFragment : Fragment() {
             val screenHeight = resources.displayMetrics.heightPixels
             val offset = resources.getDimensionPixelSize(R.dimen.bottom_sheet_extra_offset)
 
-            bottomSheetTracks.peekHeight = screenHeight - (textBottomY + offset)
+            val contentHeight = textBottomY + offset
+
+            bottomSheetTracks.peekHeight = screenHeight - contentHeight
+
+            val ratio = contentHeight.toFloat() / screenHeight.toFloat()
+            bottomSheetTracks.halfExpandedRatio = (1.0f - ratio).coerceIn(0.1f, 0.9f)
         }
 
-        bottomSheetTracks.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        bottomSheetTracks.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                overlay.visibility = if (newState == BottomSheetBehavior.STATE_HIDDEN) View.GONE else View.VISIBLE
+                overlay.visibility = if (newState == BottomSheetBehavior.STATE_EXPANDED ||
+                    newState == BottomSheetBehavior.STATE_DRAGGING
+                ) {
+                    View.VISIBLE
+                } else {
+                    if (bottomSheetTracks.state == BottomSheetBehavior.STATE_COLLAPSED) View.GONE
+                    else View.VISIBLE
+                }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                overlay.alpha = (slideOffset.coerceIn(0f, 1f) * 0.8f)
+                if (slideOffset <= 0f) {
+                    overlay.alpha = 0f
+                } else {
+                    overlay.alpha = slideOffset * 0.8f
+                }
             }
         })
-    }
-
-    private fun updateTrackBottomSheet(tracks: List<Track>) {
-        if (tracks.isEmpty()) {
-            bottomSheetTracks.state = BottomSheetBehavior.STATE_HIDDEN
-        } else {
-            bottomSheetTracks.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
     }
 
     fun setupMenuBottomSheet() {
@@ -227,7 +234,9 @@ class PlaylistInfoFragment : Fragment() {
                 when (newState) {
                     BottomSheetBehavior.STATE_HIDDEN -> {
                         overlay.visibility = View.GONE
+                        bottomSheetTracks.isDraggable = true
                     }
+
                     else -> {
                         overlay.visibility = View.VISIBLE
                     }
@@ -246,40 +255,65 @@ class PlaylistInfoFragment : Fragment() {
     }
 
     private fun showMenu() {
+        bottomSheetTracks.isDraggable = false
         binding.overlayMenu.visibility = View.VISIBLE
         binding.overlayMenu.alpha = 0f
-        bottomSheetMenu.state = BottomSheetBehavior.STATE_COLLAPSED // или STATE_EXPANDED
+        bottomSheetMenu.state = BottomSheetBehavior.STATE_EXPANDED
+        if (currentPlaylist?.imageUri?.isNotEmpty() == true) {
+            binding.menuIconAlbum.setImageURI(currentPlaylist?.imageUri?.toUri())
+        }
+        binding.menuIconAlbum.scaleType = ImageView.ScaleType.CENTER_CROP
+        binding.menuAlbumName.text = currentPlaylist?.name
+
+        val tracksText = resources.getQuantityString(
+            R.plurals.tracks_count,
+            currentTracks.size,
+            currentTracks.size
+        )
+        binding.menuTrackCount.text = tracksText
     }
 
     private fun showDeleteDialog(track: Track) {
-        MaterialAlertDialogBuilder(requireContext())
-            //TODO
-            .setTitle("Хотите удалить трек?")
-            .setNeutralButton("Нет") { dialog, _ ->
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.delete_track_title))
+            .setNegativeButton(getString(R.string.no_button)) { dialog, _ ->
                 dialog.dismiss()
             }
-            .setPositiveButton("Да") { dialog, _ ->
+            .setPositiveButton(getString(R.string.yes_button)) { dialog, _ ->
                 viewModel.deleteTrack(track)
                 dialog.dismiss()
             }
-            .show()
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.let { it.gravity = Gravity.END }
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.let { it.gravity = Gravity.END }
+        }
+
+        dialog.show()
     }
 
     private fun showDeleteDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            //TODO
-            .setTitle("Хотите удалить плейлист?")
-            .setNeutralButton("Нет") { dialog, _ ->
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.delete_playlist_title, currentPlaylist?.name))
+            .setNegativeButton(getString(R.string.no_button)) { dialog, _ ->
                 dialog.dismiss()
             }
-            .setPositiveButton("Да") { dialog, _ ->
+            .setPositiveButton(getString(R.string.yes_button)) { dialog, _ ->
                 viewModel.viewModelScope.launch {
                     viewModel.deletePlaylist()
                     dialog.dismiss()
                     findNavController().navigateUp()
                 }
             }
-            .show()
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.let { it.gravity = Gravity.END }
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.let { it.gravity = Gravity.END }
+        }
+
+        dialog.show()
     }
 
     private fun showToast() {
@@ -287,8 +321,7 @@ class PlaylistInfoFragment : Fragment() {
         val layout = inflater.inflate(R.layout.custom_toast, null)
 
         val textView = layout.findViewById<TextView>(R.id.toast_text)
-        textView.text = "В этом плейлисте нет списка треков, которым можно поделиться"
-
+        textView.text = getString(R.string.playlist_no_shareable_tracks)
         toast?.cancel()
 
         toast = Toast(requireContext()).apply {

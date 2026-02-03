@@ -3,6 +3,7 @@
 
     <color name="text_color">@color/yp_black</color>
     <color name="text_color_revers">@color/yp_white</color>
+    <color name="text_color_black">@color/yp_black</color>
 
     <!--Main-->
     <color name="text_color_title_main_screen">@color/yp_white</color>

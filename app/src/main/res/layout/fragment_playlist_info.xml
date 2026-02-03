@@ -5,13 +5,13 @@
     android:id="@+id/rootFragmentPlaylistInfo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_playlist_info"
     android:fitsSystemWindows="true"
     >
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/background_playlist_info"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -49,6 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="24dp"
+                android:textColor="@color/text_color_black"
                 android:textSize="22sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/playlist_image" />
@@ -60,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="8dp"
+                android:textColor="@color/text_color_black"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/playlist_name" />
@@ -71,6 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="8dp"
+                android:textColor="@color/text_color_black"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/playlist_description" />
@@ -169,9 +172,9 @@
                 android:id="@+id/menu_icon_album"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                android:paddingVertical="8dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginBottom="16dp"
+                android:paddingVertical="8dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_album_placeholder"
                 app:layout_constraintStart_toStartOf="parent"
@@ -181,50 +184,49 @@
                 android:id="@+id/menu_album_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Album"
-                android:textSize="16sp"
-                android:textColor="@color/text_color"
-                android:fontFamily="@font/ys_display_regular"
                 android:layout_marginStart="12dp"
+                android:fontFamily="@font/ys_display_regular"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@id/menu_track_count"
                 app:layout_constraintStart_toEndOf="@id/menu_icon_album"
                 app:layout_constraintTop_toTopOf="@id/menu_icon_album"
-                app:layout_constraintBottom_toTopOf="@id/menu_track_count"
                 app:layout_constraintVertical_chainStyle="packed" />
 
             <TextView
                 android:id="@+id/menu_track_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="98 треков"
-                android:textSize="11sp"
-                android:textColor="@color/yp_gray"
                 android:layout_marginStart="12dp"
+                android:textColor="@color/yp_gray"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="@id/menu_icon_album"
                 app:layout_constraintStart_toEndOf="@id/menu_icon_album"
-                app:layout_constraintTop_toBottomOf="@id/menu_album_name"
-                app:layout_constraintBottom_toBottomOf="@id/menu_icon_album" />
+                app:layout_constraintTop_toBottomOf="@id/menu_album_name" />
 
             <TextView
                 android:id="@+id/menu_share"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="22dp"
-                android:text="Поделиться"
-                android:textSize="16sp"
-                android:textColor="@color/text_color"
                 android:layout_marginStart="12dp"
+                android:paddingTop="30dp"
+                android:paddingBottom="22dp"
+                android:text="@string/share"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="@id/menu_icon_album"
                 app:layout_constraintTop_toBottomOf="@id/menu_icon_album"
-                 />
+                />
 
             <TextView
                 android:id="@+id/menu_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="22dp"
-                android:text="Редактировать информацию"
-                android:textSize="16sp"
-                android:textColor="@color/text_color"
                 android:layout_marginStart="12dp"
+                android:paddingVertical="22dp"
+                android:text="@string/edit_info"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="@id/menu_icon_album"
                 app:layout_constraintTop_toBottomOf="@id/menu_share"
                 />
@@ -233,18 +235,16 @@
                 android:id="@+id/menu_delete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:paddingTop="22dp"
                 android:paddingBottom="80dp"
-                android:text="Удалить плейлист"
-                android:textSize="16sp"
+                android:text="@string/delete_playlist"
                 android:textColor="@color/text_color"
-                android:layout_marginStart="12dp"
+                android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="@id/menu_icon_album"
                 app:layout_constraintTop_toBottomOf="@id/menu_edit"
                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </LinearLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

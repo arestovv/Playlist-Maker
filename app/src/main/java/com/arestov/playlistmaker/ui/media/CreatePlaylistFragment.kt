@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -50,7 +51,6 @@ class CreatePlaylistFragment : Fragment() {
 
         if (flagUpdate) viewModel.setPlaylist(playlistId)
 
-        //сохраняем путь до картинки для передачи в БД при создании плейлиста
         viewModel.stateScreenLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is CreatePlaylistScreenState.Playlist -> {
@@ -64,14 +64,11 @@ class CreatePlaylistFragment : Fragment() {
 
         }
 
-        //Загрузка картинки из памяти
         val pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
-                    //Устанавливаем картинку во вью
                     binding.pickerImage.setImageURI(uri)
                     binding.pickerImage.scaleType = ImageView.ScaleType.CENTER_CROP
-                    //сохраняем картинку в приватную память
                     viewModel.saveImageToPrivateStorage(requireContext(), uri)
                 }
             }
@@ -80,7 +77,6 @@ class CreatePlaylistFragment : Fragment() {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
-        //Если поле "Название" заполнено, тогда кнопка "Создать" активна
         binding.namePlaylistInput.doOnTextChanged { text, _, _, _ ->
             binding.createPlaylistButton.isEnabled = !text.isNullOrEmpty()
         }
@@ -124,9 +120,10 @@ class CreatePlaylistFragment : Fragment() {
     private fun showPlaylistDate(playlist: Playlist) {
         binding.apply {
             pickerImage.setImageURI(playlist.imageUri.toUri())
+            pickerImage.scaleType = ImageView.ScaleType.CENTER_CROP
             namePlaylistInput.setText(playlist.name)
             descriptionPlaylistInput.setText(playlist.description)
-            createPlaylistButton.setText("Update")
+            createPlaylistButton.setText(getString(R.string.save))
         }
     }
 
@@ -139,15 +136,25 @@ class CreatePlaylistFragment : Fragment() {
         fun newInstance() = CreatePlaylistFragment()
     }
 
-    //Окно для подтверждения выхода
-    private fun createPopupNeedToSave(): MaterialAlertDialogBuilder {
-        return MaterialAlertDialogBuilder(requireContext())
+    // Окно для подтверждения выхода
+    private fun createPopupNeedToSave(): AlertDialog {
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_finish_playlist_title))
             .setMessage(getString(R.string.dialog_finish_playlist_message))
-            .setNeutralButton(R.string.dialog_cancel) { dialog, which ->
-            }.setNegativeButton(R.string.dialog_finish) { dialog, which ->
+            .setNegativeButton(R.string.dialog_cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(R.string.dialog_finish) { dialog, _ ->
                 findNavController().navigateUp()
             }
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.let { it.gravity = Gravity.END }
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.let { it.gravity = Gravity.END }
+        }
+
+        return dialog
     }
 
     //Показать окно подтверждения при выходе из создания плейлиста
