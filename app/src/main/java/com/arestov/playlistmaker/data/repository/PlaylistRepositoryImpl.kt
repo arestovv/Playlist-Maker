@@ -111,8 +111,7 @@ class PlaylistRepositoryImpl(
             val track = convertFromPlaylistTrackEntityToTrack(playlistTrackEntity)
             trackList.add(track)
         }
-
-        emit(trackList)
+        emit(trackList.reversed())
     }
 
     override suspend fun getPlaylistTrack(trackId: Long): Track {

@@ -64,7 +64,7 @@ class CreatePlaylistFragment : Fragment() {
     private fun setupObservers() {
         viewModel.stateScreenLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is CreatePlaylistScreenState.Playlist -> showPlaylistData(state.playlist)
+                is CreatePlaylistScreenState.Content -> showPlaylistData(state.playlist)
                 is CreatePlaylistScreenState.ImagePath -> imageUri = state.path
             }
         }

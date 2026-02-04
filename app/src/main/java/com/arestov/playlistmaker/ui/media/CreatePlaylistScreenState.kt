@@ -1,6 +1,8 @@
 package com.arestov.playlistmaker.ui.media
 
-sealed class CreatePlaylistScreenState {
-    data class Playlist(val playlist: com.arestov.playlistmaker.domain.search.model.Playlist) : CreatePlaylistScreenState()
-    data class ImagePath(val path: String) : CreatePlaylistScreenState()
+import com.arestov.playlistmaker.domain.search.model.Playlist
+
+sealed interface CreatePlaylistScreenState {
+    data class Content(val playlist: Playlist) : CreatePlaylistScreenState
+    data class ImagePath(val path: String) : CreatePlaylistScreenState
 }

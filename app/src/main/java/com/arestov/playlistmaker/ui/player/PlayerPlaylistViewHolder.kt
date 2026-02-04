@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.domain.search.model.Playlist
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.io.File
 
 class PlayerPlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -18,11 +20,13 @@ class PlayerPlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     fun bind(playlist: Playlist) {
         val file = File(playlist.imageUri)
+        val radiusInPx = (image.context.resources.displayMetrics.density * 8).toInt()
+
         Glide.with(image.context)
             .load(Uri.fromFile(file))
             .placeholder(R.drawable.ic_album_placeholder)
             .error(R.drawable.ic_album_placeholder)
-            .centerCrop()
+            .transform(CenterCrop(), RoundedCorners(radiusInPx))
             .into(image)
 
         name.text = playlist.name

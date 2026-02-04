@@ -126,9 +126,12 @@ class PlayerFragment : Fragment() {
 
                 is PlayerScreenState.TrackAddedToPlaylist -> {
                     if (state.isAdded) {
-                        showToast(getString(
-                            R.string.added_to_playlist,
-                            state.playlist.name))
+                        showToast(
+                            getString(
+                                R.string.added_to_playlist,
+                                state.playlist.name
+                            )
+                        )
                         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
                     } else {
@@ -148,7 +151,8 @@ class PlayerFragment : Fragment() {
         }
 
         binding.createPlaylistButton.setOnClickListener {
-            findNavController().navigate(R.id.action_playerFragment_to_createPlaylistFragment)
+            val action = PlayerFragmentDirections.actionPlayerFragmentToCreatePlaylistFragment(-1)
+            findNavController().navigate(action)
         }
 
         val bottomSheetContainer = binding.playlistsBottomSheet

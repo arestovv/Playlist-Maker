@@ -284,6 +284,13 @@ class PlaylistInfoFragment : Fragment() {
         findNavController().navigate(R.id.action_playlistInfoFragment_to_playerFragment)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::bottomSheetMenu.isInitialized) {
+            bottomSheetMenu.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

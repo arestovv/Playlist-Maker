@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,7 +52,7 @@ class CreatePlaylistViewModel(
     fun setPlaylist(playlistId: Int) {
         viewModelScope.launch {
             val playlist = playlistInteractor.getPlaylist(playlistId)
-            _stateScreen.postValue(CreatePlaylistScreenState.Playlist(playlist))
+            _stateScreen.postValue(CreatePlaylistScreenState.Content(playlist))
         }
     }
 
