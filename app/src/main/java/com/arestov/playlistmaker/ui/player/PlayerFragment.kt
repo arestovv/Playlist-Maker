@@ -1,6 +1,14 @@
 package com.arestov.playlistmaker.ui.player
 
+import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +16,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -30,6 +40,20 @@ class PlayerFragment : Fragment() {
     private var toast: Toast? = null
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as PlayerService.PlayerBinder
+            viewModel.setPlayerControl(binder.getService())
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+        }
+    }
+
+    private val requestNotificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,6 +69,9 @@ class PlayerFragment : Fragment() {
 
 
         val track = viewModel.getTrack()
+
+        requestNotificationPermissionIfNeeded()
+        bindPlayerService(track)
 
         playlistAdapter = PlayerPlaylistAdapter(
             data = emptyList(),
@@ -190,14 +217,49 @@ class PlayerFragment : Fragment() {
     }
 
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.onPause()
+    override fun onStart() {
+        super.onStart()
+        if (hasNotificationPermission()) {
+            viewModel.onUiForeground()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (hasNotificationPermission()) {
+            viewModel.onUiBackground()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        requireContext().unbindService(serviceConnection)
         _binding = null
+    }
+
+    private fun bindPlayerService(track: Track) {
+        val intent = Intent(requireContext(), PlayerService::class.java).apply {
+            putExtra(PlayerService.EXTRA_URL, track.previewUrl)
+            putExtra(PlayerService.EXTRA_TRACK_NAME, track.trackName)
+            putExtra(PlayerService.EXTRA_ARTIST_NAME, track.artistName)
+        }
+        requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+            && !hasNotificationPermission()
+        ) {
+            requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun hasNotificationPermission(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun changeButtonState(isPlaying: Boolean) {

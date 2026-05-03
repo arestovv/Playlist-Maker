@@ -1,6 +1,5 @@
 package com.arestov.playlistmaker.ui.player
 
-import android.media.MediaPlayer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,19 +10,17 @@ import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryIntera
 import com.arestov.playlistmaker.domain.search.model.Playlist
 import com.arestov.playlistmaker.domain.search.model.Track
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class PlayerViewModel(
     private val historyInteractor: GetTrackHistoryInteractor,
     private val favoriteInteractor: FavoriteInteractor,
-    private val playlistInteractor: PlaylistInteractor,
-    private val mediaPlayer: MediaPlayer
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
-    private var timerJob: Job? = null
+    private var playerControl: PlayerControl? = null
+    private var stateJob: Job? = null
+    private var isUiInBackground = false
 
     private val playerStateProgressMutableLiveData = MutableLiveData<PlayerStateProgress>(
         PlayerStateProgress.Default(progress = DEFAULT_TIMER)
@@ -35,20 +32,45 @@ class PlayerViewModel(
     val stateScreenLiveData: LiveData<PlayerScreenState> = stateScreenMutableLiveData
 
     init {
-        preparePlayer()
         observePlaylists()
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        resetTimer()
-        mediaPlayer.release()
+    fun setPlayerControl(control: PlayerControl) {
+        playerControl = control
+        stateJob?.cancel()
+        stateJob = viewModelScope.launch {
+            control.getPlayerState().collect { state ->
+                playerStateProgressMutableLiveData.value = state
+                updateNotificationForState(state)
+            }
+        }
     }
 
     fun onPlayButtonClicked() {
         when (playerStateProgressLiveData.value) {
-            is PlayerStateProgress.Playing -> pausePlayer()
-            else -> startPlayer()
+            is PlayerStateProgress.Playing -> playerControl?.pausePlayer()
+            else -> playerControl?.startPlayer()
+        }
+    }
+
+    fun onUiBackground() {
+        isUiInBackground = true
+        if (playerStateProgressLiveData.value is PlayerStateProgress.Playing) {
+            playerControl?.showNotification()
+        }
+    }
+
+    fun onUiForeground() {
+        isUiInBackground = false
+        playerControl?.hideNotification()
+    }
+
+    private fun updateNotificationForState(state: PlayerStateProgress) {
+        if (!isUiInBackground) return
+        if (state is PlayerStateProgress.Playing) {
+            playerControl?.showNotification()
+        } else {
+            playerControl?.hideNotification()
         }
     }
 
@@ -67,72 +89,6 @@ class PlayerViewModel(
 
     fun getTrack(): Track {
         return historyInteractor.getTracks().first()
-    }
-
-    private fun preparePlayer() {
-        mediaPlayer.setDataSource(getTrack().previewUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            setPlayerState(PlayerStateProgress.Prepared(progress = DEFAULT_TIMER))
-        }
-
-        mediaPlayer.setOnCompletionListener {
-            setPlayerState(PlayerStateProgress.Prepared(progress = DEFAULT_TIMER))
-            resetTimer()
-        }
-    }
-
-    private fun startPlayer() {
-        //reset timer after play to the end track
-        if (getPlayerState() is PlayerStateProgress.Default) {
-            mediaPlayer.seekTo(0)
-        }
-        mediaPlayer.start()
-        setPlayerState(PlayerStateProgress.Playing(progress = getCurrentFormattedTime()))
-        startTimerUpdate()
-    }
-
-    private fun pausePlayer() {
-        pauseTimer()
-        mediaPlayer.pause()
-        setPlayerState(PlayerStateProgress.Paused(progress = getCurrentFormattedTime()))
-    }
-
-    private fun startTimerUpdate() {
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            while (mediaPlayer.isPlaying) {
-                setPlayerState(PlayerStateProgress.Playing(progress = getCurrentFormattedTime()))
-                delay(DELAY_TIME)
-            }
-        }
-    }
-
-    private fun pauseTimer() {
-        timerJob?.cancel()
-    }
-
-    private fun resetTimer() {
-        timerJob?.cancel()
-        playerStateProgressMutableLiveData.postValue(
-            PlayerStateProgress.Default(progress = DEFAULT_TIMER)
-        )
-    }
-
-    private fun getCurrentFormattedTime(): String {
-        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
-    }
-
-    fun onPause() {
-        pausePlayer()
-    }
-
-    private fun getPlayerState(): PlayerStateProgress? {
-        return playerStateProgressMutableLiveData.value
-    }
-
-    private fun setPlayerState(playerStateProgress: PlayerStateProgress) {
-        playerStateProgressMutableLiveData.postValue(playerStateProgress)
     }
 
     private fun observePlaylists() {
@@ -166,6 +122,5 @@ class PlayerViewModel(
 
     companion object {
         const val DEFAULT_TIMER = "00:00"
-        const val DELAY_TIME = 300L
     }
 }
