@@ -201,11 +201,7 @@ class PlayerFragment : Fragment() {
     }
 
     private fun changeButtonState(isPlaying: Boolean) {
-        if (isPlaying) {
-            binding.buttonPlay.setImageResource(R.drawable.ic_button_pause)
-        } else {
-            binding.buttonPlay.setImageResource(R.drawable.ic_button_play)
-        }
+        binding.buttonPlay.setIsPlaying(isPlaying)
     }
 
     private fun setImage(track: Track) {
