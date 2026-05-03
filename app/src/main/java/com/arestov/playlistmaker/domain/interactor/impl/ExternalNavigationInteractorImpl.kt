@@ -12,11 +12,15 @@ class ExternalNavigationInteractorImpl(
         repository.shareApp(shareAppLink)
     }
 
-   override fun openSupport(supportEmailData: EmailData) {
-       repository.openSupport(supportEmailData)
+    override fun openSupport(supportEmailData: EmailData) {
+        repository.openSupport(supportEmailData)
     }
 
     override fun openTerms(termsLink: String) {
-       repository.openTerms(termsLink)
+        repository.openTerms(termsLink)
+    }
+
+    override fun sharePlaylist(shareText: String) {
+        repository.sharePlaylist(shareText)
     }
 }

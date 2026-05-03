@@ -12,6 +12,12 @@ class TrackAdapter(
     private val onItemClick: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
+    private var onItemLongClick: ((Track) -> Unit)? = null
+
+    fun setOnItemLongClickListener(listener: (Track) -> Unit) {
+        onItemLongClick = listener
+    }
+
     private val clickDebounce: (Track) -> Unit = debounce(
         delayMillis = CLICK_DEBOUNCE_DELAY,
         coroutineScope = coroutineScope,
@@ -30,6 +36,10 @@ class TrackAdapter(
         //listener track click
         holder.itemView.setOnClickListener {
             clickDebounce(track)
+        }
+        holder.itemView.setOnLongClickListener {
+            onItemLongClick?.invoke(track)
+            true
         }
     }
 

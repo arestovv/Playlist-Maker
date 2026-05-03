@@ -2,6 +2,7 @@ package com.arestov.playlistmaker.di
 
 import com.arestov.playlistmaker.ui.media.CreatePlaylistViewModel
 import com.arestov.playlistmaker.ui.media.MediaViewModel
+import com.arestov.playlistmaker.ui.media.PlaylistInfoViewModel
 import com.arestov.playlistmaker.ui.media.PlaylistViewModel
 import com.arestov.playlistmaker.ui.player.PlayerViewModel
 import com.arestov.playlistmaker.ui.root.RootViewModel
@@ -58,6 +59,14 @@ val viewModelModule = module {
     viewModel {
         CreatePlaylistViewModel(
             playlistInteractor = get()
+        )
+    }
+
+    viewModel {
+        PlaylistInfoViewModel(
+            externalNavigationInteractor = get(),
+            playlistInteractor = get(),
+            getTrackHistoryInteractor = get()
         )
     }
 }

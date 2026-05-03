@@ -137,7 +137,7 @@ class PlayerViewModel(
 
     private fun observePlaylists() {
         viewModelScope.launch {
-            playlistInteractor.getPlaylist()
+            playlistInteractor.getPlaylists()
                 .collect { playlists ->
                     if (playlists.isEmpty()) {
                         stateScreenMutableLiveData.value = PlayerScreenState.Empty

@@ -40,8 +40,25 @@ class TrackDbConvertor {
     }
 
     // Track -> PlaylistTrackEntity
-    fun mapToPlaylistTrackEntity(track: Track): PlaylistTrackEntity {
+    fun mapTrackToPlaylistTrackEntity(track: Track): PlaylistTrackEntity {
         return PlaylistTrackEntity(
+            trackId = track.trackId,
+            trackName = track.trackName,
+            artistName = track.artistName,
+            trackTimeSeconds = track.trackTimeSeconds,
+            artworkUrl100 = track.artworkUrl100,
+            artworkUrl512 = track.artworkUrl512,
+            collectionName = track.collectionName,
+            releaseYear = track.releaseYear,
+            primaryGenreName = track.primaryGenreName,
+            country = track.country,
+            previewUrl = track.previewUrl
+        )
+    }
+
+    // PlaylistTrackEntity -> Track
+    fun mapPlaylistTrackEntityToTrack(track: PlaylistTrackEntity): Track {
+        return Track(
             trackId = track.trackId,
             trackName = track.trackName,
             artistName = track.artistName,

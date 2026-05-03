@@ -38,4 +38,16 @@ class ExternalNavigationRepositoryImpl(private val context: Context) :
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
     }
+
+    override fun sharePlaylist(shareText: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
+        }
+        val chooser = Intent.createChooser(
+            intent, context.getString(R.string.share_info_message)
+        )
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(chooser)
+    }
 }

@@ -23,14 +23,36 @@ class CreatePlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
-    private val _imagePath = MutableLiveData<String>()
-    val imagePathLiveData: LiveData<String> = _imagePath
+    private val _stateScreen = MutableLiveData<CreatePlaylistScreenState>()
+    val stateScreenLiveData: LiveData<CreatePlaylistScreenState> = _stateScreen
 
     //Сохранение плейлиста в БД
     fun addPlaylist(name: String, descriptor: String, uri: String) {
         viewModelScope.launch {
             val playlist = Playlist(0, name, descriptor, uri, emptyList(), 0)
             playlistInteractor.addPlaylist(playlist)
+        }
+    }
+
+    suspend fun updatePlaylist(playlistId: Int, name: String, descriptor: String, uri: String) {
+        val playlist = playlistInteractor.getPlaylist(playlistId)
+
+        val updatedPlaylist = playlist.copy(
+            id = playlistId,
+            name = name,
+            description = descriptor,
+            imageUri = uri,
+            trackList = playlist.trackList,
+            trackCount = playlist.trackCount
+        )
+
+        playlistInteractor.updatePlaylist(updatedPlaylist)
+    }
+
+    fun setPlaylist(playlistId: Int) {
+        viewModelScope.launch {
+            val playlist = playlistInteractor.getPlaylist(playlistId)
+            _stateScreen.postValue(CreatePlaylistScreenState.Content(playlist))
         }
     }
 
@@ -52,7 +74,7 @@ class CreatePlaylistViewModel(
                 }
             }
 
-            _imagePath.postValue(file.absolutePath)
+            _stateScreen.postValue(CreatePlaylistScreenState.ImagePath(file.absolutePath))
         }
     }
 }
