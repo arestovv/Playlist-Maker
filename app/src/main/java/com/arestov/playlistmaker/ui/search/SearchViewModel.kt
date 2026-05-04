@@ -24,6 +24,8 @@ class SearchViewModel(
     private var previousText = ""
     private var searchJob: Job? = null
 
+    val currentQuery: String get() = previousText
+
     fun start() {
         if (previousText.isEmpty()) loadHistory()
     }

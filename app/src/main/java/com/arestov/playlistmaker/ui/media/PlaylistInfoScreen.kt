@@ -50,8 +50,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.arestov.playlistmaker.R
+import com.arestov.playlistmaker.ui.compose.theme.YpBlack
+import com.arestov.playlistmaker.ui.compose.theme.YpLightGray
 import com.arestov.playlistmaker.domain.search.model.Playlist
 import com.arestov.playlistmaker.domain.search.model.Track
 import com.arestov.playlistmaker.ui.compose.components.TrackItem
@@ -106,9 +110,12 @@ fun PlaylistInfoScreen(
         scaffoldState = scaffoldState,
         sheetPeekHeight = 240.dp,
         sheetContainerColor = MaterialTheme.colorScheme.background,
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        containerColor = MaterialTheme.colorScheme.background,
         sheetContent = {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(vertical = 12.dp)
+            ) {
                 items(items = tracks, key = { it.trackId }) { track ->
                     TrackItem(
                         track = track,
@@ -219,7 +226,7 @@ private fun PlaylistHeader(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Box(
             modifier = Modifier
@@ -246,7 +253,7 @@ private fun PlaylistHeader(
 
             IconButton(
                 onClick = onBack,
-                modifier = Modifier.padding(start = 8.dp, top = 8.dp),
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_back),
@@ -258,7 +265,7 @@ private fun PlaylistHeader(
 
         Text(
             text = playlist?.name.orEmpty(),
-            style = MaterialTheme.typography.titleLarge,
+            fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp)
         )
@@ -266,7 +273,7 @@ private fun PlaylistHeader(
         if (!playlist?.description.isNullOrEmpty()) {
             Text(
                 text = playlist!!.description,
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
             )
@@ -274,24 +281,29 @@ private fun PlaylistHeader(
 
         Text(
             text = playlistInfoLine(LocalContext.current, tracks),
-            style = MaterialTheme.typography.bodyLarge,
+            fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
         )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+            modifier = Modifier.padding(start = 8.dp, top = 16.dp)
         ) {
-            IconButton(onClick = onShare) {
+            IconButton(
+                onClick = onShare,
+                modifier = Modifier.size(32.dp)
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_share_playlist),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(onClick = onMenu) {
+
+            IconButton(onClick = onMenu,
+                modifier = Modifier.size(32.dp)
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_menu),
                     contentDescription = null,
@@ -346,20 +358,42 @@ private fun MenuSheetContent(
                 )
                 Text(
                     text = pluralStringResource(R.plurals.tracks_count, trackCount, trackCount),
-                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.outline,
                 )
             }
         }
 
-        MenuItem(text = stringResource(R.string.share), onClick = onShare)
-        MenuItem(text = stringResource(R.string.edit_info), onClick = onEdit)
-        MenuItem(text = stringResource(R.string.delete_playlist), onClick = onDelete)
+        MenuItem(
+            text = stringResource(R.string.share),
+            onClick = onShare,
+            top = 30.dp,
+            bottom = 22.dp
+        )
+
+        MenuItem(
+            text = stringResource(R.string.edit_info),
+            onClick = onEdit,
+            top = 22.dp,
+            bottom = 22.dp
+        )
+
+        MenuItem(
+            text = stringResource(R.string.delete_playlist),
+            onClick = onDelete,
+            top = 22.dp,
+            bottom = 80.dp
+        )
     }
 }
 
 @Composable
-private fun MenuItem(text: String, onClick: () -> Unit) {
+private fun MenuItem(
+    text: String,
+    onClick: () -> Unit,
+    top: Dp,
+    bottom: Dp
+) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyLarge,
@@ -367,7 +401,7 @@ private fun MenuItem(text: String, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 16.dp)
+            .padding(start = 12.dp, top = top, bottom = bottom)
     )
 }
 

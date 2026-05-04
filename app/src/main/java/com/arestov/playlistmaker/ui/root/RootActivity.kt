@@ -2,7 +2,11 @@ package com.arestov.playlistmaker.ui.root
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.arestov.playlistmaker.R
@@ -16,11 +20,18 @@ class RootActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRootBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         ThemeManager.setDarkMode(viewModel.getStateDarkMode())
 
         binding = ActivityRootBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNavigationView) { view, insets ->
+            val bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            view.updatePadding(bottom = bottom)
+            insets
+        }
 
         val navHostFragment = supportFragmentManager.findFragmentById(
             R.id.rootFragmentContainerView

@@ -29,6 +29,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -156,7 +157,7 @@ fun PlayerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 24.dp),
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Start,
             )
             Text(
                 text = track.artistName,
@@ -164,8 +165,8 @@ fun PlayerScreen(
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                textAlign = TextAlign.Center,
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                textAlign = TextAlign.Start,
             )
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -256,7 +257,13 @@ fun PlayerScreen(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Button(onClick = onCreatePlaylistClick) {
+                    Button(
+                        onClick = onCreatePlaylistClick,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onBackground,
+                            contentColor = MaterialTheme.colorScheme.background,
+                        ),
+                    ) {
                         Text(stringResource(R.string.new_playlist))
                     }
                 }

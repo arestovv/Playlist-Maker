@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.arestov.playlistmaker.R
+import com.arestov.playlistmaker.ui.compose.theme.YpBlack
 import com.arestov.playlistmaker.domain.search.model.Track
 import com.arestov.playlistmaker.ui.compose.components.TrackItem
 import org.koin.androidx.compose.koinViewModel
@@ -57,7 +59,7 @@ fun SearchScreen(
     val state by viewModel.screenStateLiveData
         .observeAsState(initial = SearchScreenState.EmptyHistory)
 
-    var query by remember { mutableStateOf("") }
+    var query by remember { mutableStateOf(viewModel.currentQuery) }
     val focusRequester = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
 
@@ -116,10 +118,18 @@ fun SearchScreen(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = YpBlack,
+                unfocusedTextColor = YpBlack,
                 focusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -223,7 +233,13 @@ private fun HistoryBlock(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            Button(onClick = onClearHistory) {
+            Button(
+                onClick = onClearHistory,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onBackground,
+                    contentColor = MaterialTheme.colorScheme.background,
+                )
+            ) {
                 Text(stringResource(R.string.clear_history))
             }
         }
