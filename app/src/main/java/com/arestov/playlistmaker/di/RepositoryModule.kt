@@ -63,6 +63,6 @@ val repositoryModule = module {
     factory { PlaylistDbConvertor() }
 
     single<PlaylistRepository> {
-        PlaylistRepositoryImpl(get(), get(), get(), get())
+        PlaylistRepositoryImpl(get(), get(), get(), get(), get())
     }
 }

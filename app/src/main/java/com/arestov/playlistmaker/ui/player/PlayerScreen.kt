@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +47,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -93,18 +93,16 @@ fun PlayerScreen(
 
     var showAddSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(screenState) {
-        val s = screenState
-        if (s is PlayerScreenState.TrackAddedToPlaylist) {
-            val msg = if (s.isAdded)
-                context.getString(R.string.added_to_playlist, s.playlist.name)
+    LaunchedEffect(viewModel) {
+        viewModel.trackAddedEvent.collect { (playlist, isAdded) ->
+            val msg = if (isAdded)
+                context.getString(R.string.added_to_playlist, playlist.name)
             else
-                context.getString(R.string.track_already_added_to_playlist, s.playlist.name)
+                context.getString(R.string.track_already_added_to_playlist, playlist.name)
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-            if (s.isAdded) {
-                scope.launch { sheetState.hide() }
+            if (isAdded) {
+                sheetState.hide()
                 showAddSheet = false
             }
         }
@@ -242,6 +240,9 @@ fun PlayerScreen(
             onDismissRequest = { showAddSheet = false },
             sheetState = sheetState,
             containerColor = MaterialTheme.colorScheme.background,
+            dragHandle = {
+                BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.onBackground)
+            },
         ) {
             Column(modifier = Modifier.padding(bottom = 24.dp)) {
                 Text(

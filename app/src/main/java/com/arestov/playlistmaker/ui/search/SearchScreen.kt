@@ -160,9 +160,7 @@ fun SearchScreen(
                 imageRes = R.drawable.ic_network_problem,
                 text = stringResource(R.string.network_problem),
                 buttonText = stringResource(R.string.update),
-                onButtonClick = {
-                    viewModel.searchTracks(query)
-                }
+                onButtonClick = { viewModel.retrySearch() }
             )
 
             is SearchScreenState.HistoryContent -> {
@@ -291,7 +289,13 @@ private fun InfoBlock(
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
         if (buttonText != null && onButtonClick != null) {
-            Button(onClick = onButtonClick) {
+            Button(
+                onClick = onButtonClick,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onBackground,
+                    contentColor = MaterialTheme.colorScheme.background,
+                )
+            ) {
                 Text(buttonText)
             }
         }

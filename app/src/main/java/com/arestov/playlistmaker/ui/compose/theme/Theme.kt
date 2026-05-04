@@ -32,6 +32,12 @@ private val DarkColors = darkColorScheme(
     onSurface = YpWhite,
     surfaceVariant = YpWhite,
     onSurfaceVariant = YpBlack,
+    surfaceContainer = YpBlack,
+    surfaceContainerLow = YpBlack,
+    surfaceContainerHigh = YpBlack,
+    surfaceContainerLowest = YpBlack,
+    surfaceContainerHighest = YpBlack,
+    surfaceTint = YpBlack,
     outline = YpGray,
     error = YpRed,
 )

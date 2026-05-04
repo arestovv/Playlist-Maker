@@ -68,6 +68,12 @@ class SearchViewModel(
         }
     }
 
+    fun retrySearch() {
+        val text = previousText
+        previousText = ""
+        searchTracks(text)
+    }
+
     fun searchTracks(searchText: String) {
         if (searchText == previousText) return
 

@@ -11,7 +11,9 @@ class TrackRetrofitNetworkClient(
         return try {
             val response = api.search(text)
             response.apply { resultCode = 200 }
-        } catch (_: CancellationException) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
             NetworkResponse().apply { resultCode = -1 }
         }
     }

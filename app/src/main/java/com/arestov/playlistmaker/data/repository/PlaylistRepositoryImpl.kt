@@ -2,6 +2,7 @@ package com.arestov.playlistmaker.data.repository
 
 import com.arestov.playlistmaker.data.converters.PlaylistDbConvertor
 import com.arestov.playlistmaker.data.converters.TrackDbConvertor
+import com.arestov.playlistmaker.data.db.dao.FavoriteTrackDao
 import com.arestov.playlistmaker.data.db.dao.PlaylistDao
 import com.arestov.playlistmaker.data.db.dao.PlaylistTrackDao
 import com.arestov.playlistmaker.data.db.entity.PlaylistEntity
@@ -20,6 +21,7 @@ import kotlin.collections.map
 class PlaylistRepositoryImpl(
     private val playlistDao: PlaylistDao,
     private val playlistTrackDao: PlaylistTrackDao,
+    private val favoriteTrackDao: FavoriteTrackDao,
     private val playlistDbConvertor: PlaylistDbConvertor,
     private val trackDbConvertor: TrackDbConvertor,
 ) : PlaylistRepository {
@@ -109,6 +111,7 @@ class PlaylistRepositoryImpl(
         for (trackId in trackIdList) {
             val playlistTrackEntity = playlistTrackDao.getTrack(trackId)
             val track = convertFromPlaylistTrackEntityToTrack(playlistTrackEntity)
+            track.isFavorite = favoriteTrackDao.isFavorite(trackId)
             trackList.add(track)
         }
         emit(trackList.reversed())

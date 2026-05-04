@@ -34,6 +34,7 @@ fun TrackItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
+    trailingIcon: Int? = if (onLongClick == null) R.drawable.ic_arrow_forward else null,
 ) {
     val rowModifier = if (onLongClick != null) {
         modifier
@@ -96,10 +97,10 @@ fun TrackItem(
             }
         }
 
-        if (onLongClick == null) {
+        if (trailingIcon != null) {
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                painter = painterResource(R.drawable.ic_arrow_forward),
+                painter = painterResource(trailingIcon),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onBackground
             )

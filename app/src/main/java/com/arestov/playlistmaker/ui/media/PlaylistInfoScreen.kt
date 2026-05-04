@@ -1,10 +1,12 @@
 package com.arestov.playlistmaker.ui.media
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,6 +37,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -55,10 +60,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arestov.playlistmaker.R
 import com.arestov.playlistmaker.ui.compose.theme.YpBlack
-import com.arestov.playlistmaker.ui.compose.theme.YpLightGray
+import com.arestov.playlistmaker.ui.compose.theme.YpGray
 import com.arestov.playlistmaker.domain.search.model.Playlist
 import com.arestov.playlistmaker.domain.search.model.Track
 import com.arestov.playlistmaker.ui.compose.components.TrackItem
+import com.arestov.playlistmaker.ui.compose.theme.YpLightGray
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
@@ -106,37 +112,62 @@ fun PlaylistInfoScreen(
         )
     )
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 240.dp,
-        sheetContainerColor = MaterialTheme.colorScheme.background,
-        containerColor = MaterialTheme.colorScheme.background,
-        sheetContent = {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(vertical = 12.dp)
-            ) {
-                items(items = tracks, key = { it.trackId }) { track ->
-                    TrackItem(
-                        track = track,
-                        onClick = {
-                            viewModel.saveTrack(track)
-                            onTrackClick()
-                        },
-                        onLongClick = { trackToDelete = track }
-                    )
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val maxHeightPx = with(LocalDensity.current) { maxHeight.toPx() }
+        val peekHeightPx = with(LocalDensity.current) { 240.dp.toPx() }
+        val maxSheetOffset = maxHeightPx - peekHeightPx
+
+        val rawSheetOffset by remember(scaffoldState) {
+            derivedStateOf {
+                try {
+                    scaffoldState.bottomSheetState.requireOffset()
+                } catch (_: IllegalStateException) {
+                    maxSheetOffset
                 }
             }
         }
-    ) { padding ->
-        PlaylistHeader(
-            playlist = playlist,
-            tracks = tracks,
-            paddingValues = padding,
-            onBack = onBack,
-            onShare = { viewModel.sharePlaylist(quantityTracks(context, tracks.size)) },
-            onMenu = { showMenu = true }
-        )
+
+        val scrimAlpha = if (maxSheetOffset > 0f) {
+            (1f - rawSheetOffset / maxSheetOffset).coerceIn(0f, 0.6f)
+        } else 0f
+
+        BottomSheetScaffold(
+            scaffoldState = scaffoldState,
+            sheetPeekHeight = 240.dp,
+            sheetContainerColor = MaterialTheme.colorScheme.background,
+            containerColor = YpLightGray,
+            sheetDragHandle = {
+                BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.onBackground)
+            },
+            sheetContent = {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(vertical = 12.dp)
+                ) {
+                    items(items = tracks, key = { it.trackId }) { track ->
+                        TrackItem(
+                            track = track,
+                            onClick = {
+                                viewModel.saveTrack(track)
+                                onTrackClick()
+                            },
+                            onLongClick = { trackToDelete = track },
+                            trailingIcon = R.drawable.ic_arrow
+                        )
+                    }
+                }
+            }
+        ) { padding ->
+            PlaylistHeader(
+                playlist = playlist,
+                tracks = tracks,
+                paddingValues = padding,
+                scrimAlpha = scrimAlpha,
+                onBack = onBack,
+                onShare = { viewModel.sharePlaylist(quantityTracks(context, tracks.size)) },
+                onMenu = { showMenu = true }
+            )
+        }
     }
 
     if (showMenu) {
@@ -145,6 +176,9 @@ fun PlaylistInfoScreen(
             onDismissRequest = { showMenu = false },
             sheetState = menuSheetState,
             containerColor = MaterialTheme.colorScheme.background,
+            dragHandle = {
+                BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.onBackground)
+            },
         ) {
             MenuSheetContent(
                 playlist = playlist,
@@ -218,99 +252,109 @@ private fun PlaylistHeader(
     playlist: Playlist?,
     tracks: List<Track>,
     paddingValues: PaddingValues,
+    scrimAlpha: Float,
     onBack: () -> Unit,
     onShare: () -> Unit,
     onMenu: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Box(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(YpLightGray)
         ) {
-            if (playlist != null && playlist.imageUri.isNotEmpty()) {
-                GlideImage(
-                    model = File(playlist.imageUri),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    loading = placeholder(R.drawable.im_album_placeholder),
-                    failure = placeholder(R.drawable.im_album_placeholder),
-                )
-            } else {
-                Icon(
-                    painter = painterResource(R.drawable.im_album_placeholder),
-                    contentDescription = null,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground
+                if (playlist != null && playlist.imageUri.isNotEmpty()) {
+                    GlideImage(
+                        model = File(playlist.imageUri),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                        loading = placeholder(R.drawable.im_album_placeholder),
+                        failure = placeholder(R.drawable.im_album_placeholder),
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.im_album_placeholder),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_back),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
+
+            Text(
+                text = playlist?.name.orEmpty(),
+                fontSize = 22.sp,
+                color = YpBlack,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp)
+            )
+
+            if (playlist != null && playlist.description.isNotEmpty()) {
+                Text(
+                    text = playlist.description,
+                    fontSize = 18.sp,
+                    color = YpBlack,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
                 )
             }
-        }
 
-        Text(
-            text = playlist?.name.orEmpty(),
-            fontSize = 22.sp,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp)
-        )
-
-        if (!playlist?.description.isNullOrEmpty()) {
             Text(
-                text = playlist!!.description,
+                text = playlistInfoLine(LocalContext.current, tracks),
                 fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = YpBlack,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
             )
-        }
 
-        Text(
-            text = playlistInfoLine(LocalContext.current, tracks),
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 8.dp, top = 16.dp)
+            ) {
+                IconButton(
+                    onClick = onShare,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_share_playlist),
+                        contentDescription = null,
+                        tint = YpBlack
+                    )
+                }
+
+                IconButton(
+                    onClick = onMenu,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_menu),
+                        contentDescription = null,
+                        tint = YpBlack
+                    )
+                }
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color.Black.copy(alpha = scrimAlpha))
         )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 8.dp, top = 16.dp)
-        ) {
-            IconButton(
-                onClick = onShare,
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_share_playlist),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            IconButton(onClick = onMenu,
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_menu),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        }
     }
 }
 

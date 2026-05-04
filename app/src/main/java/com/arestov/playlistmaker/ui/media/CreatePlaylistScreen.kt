@@ -290,6 +290,9 @@ fun CreatePlaylistScreen(
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            textContentColor = MaterialTheme.colorScheme.onBackground,
             title = { Text(stringResource(R.string.dialog_finish_playlist_title)) },
             text = { Text(stringResource(R.string.dialog_finish_playlist_message)) },
             confirmButton = {
