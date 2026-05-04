@@ -2,51 +2,19 @@
 <resources>
 
     <color name="text_color">@color/yp_black</color>
-    <color name="text_color_revers">@color/yp_white</color>
-    <color name="text_color_black">@color/yp_black</color>
 
-    <!--Main-->
-    <color name="text_color_title_main_screen">@color/yp_white</color>
-    <color name="text_color_main_screen">@color/yp_black</color>
-    <color name="background_main_screen">@color/yp_blue</color>
-    <!--Settings-->
-    <color name="background_setting_screen">@color/yp_white</color>
     <color name="icon_color_main_screen">@color/yp_black</color>
     <color name="icon_color_setting_screen">@color/yp_gray</color>
-    <color name="icon_knob_off_setting_screen">@color/yp_gray</color>
-    <color name="icon_knob_on_setting_screen">@color/yp_blue</color>
-    <color name="icon_track_off_setting_screen">#E6E8EB</color>
-    <color name="icon_track_on_setting_screen">#9FBBF3</color>
 
-    <!--Search-->
-    <color name="background_search_screen">@color/yp_white</color>
-    <color name="color_input_search_screen">@color/yp_light_gray</color>
     <color name="color_edit_search_screen">@color/yp_gray</color>
-    <color name="text_color_edit_search_screen">@color/yp_black</color>
     <color name="color_track_view_search_screen">@color/yp_gray</color>
     <color name="color_container_info">@color/yp_black</color>
 
-    <!--Player-->
-    <color name="background_player_screen">@color/yp_white</color>
     <color name="color_buttons_player_screen">@color/yp_black</color>
 
-    <!--Media-->
-    <color name="background_media_screen">@color/yp_white</color>
-    <color name="tab_indicator_color">@color/yp_black</color>
-    <color name="color_buttons_media_screen">@color/yp_black</color>
-    <color name="color_playlist_count_track">@color/yp_gray</color>
-    <color name="color_box_stroke">@color/yp_gray</color>
-    <color name="background_playlist_info">@color/yp_light_gray</color>
-
-
-    <!--Root-->
     <color name="bottom_navigation">@color/yp_white</color>
     <color name="bottom_navigation_top_strip">@color/yp_light_gray</color>
 
-    <!--Toast-->
-    <color name="toast_background">@color/yp_black</color>
-
-    <!--Colors-->
     <color name="yp_white">#FFFFFF</color>
     <color name="yp_gray">#AEAFB4</color>
     <color name="yp_light_gray">#E6E8EB</color>

@@ -10,6 +10,9 @@ import com.arestov.playlistmaker.domain.search.interactors.GetTrackHistoryIntera
 import com.arestov.playlistmaker.domain.search.model.Playlist
 import com.arestov.playlistmaker.domain.search.model.Track
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
@@ -30,6 +33,9 @@ class PlayerViewModel(
 
     private val stateScreenMutableLiveData = MutableLiveData<PlayerScreenState>()
     val stateScreenLiveData: LiveData<PlayerScreenState> = stateScreenMutableLiveData
+
+    private val _trackAddedEvent = MutableSharedFlow<Pair<Playlist, Boolean>>()
+    val trackAddedEvent: SharedFlow<Pair<Playlist, Boolean>> = _trackAddedEvent.asSharedFlow()
 
     init {
         observePlaylists()
@@ -106,17 +112,11 @@ class PlayerViewModel(
 
     fun addTrackToPlaylist(playlist: Playlist, track: Track) {
         viewModelScope.launch {
-            if (!playlistInteractor.hasPlaylistTrack(playlist.id, track.trackId)) {
+            val isAdded = !playlistInteractor.hasPlaylistTrack(playlist.id, track.trackId)
+            if (isAdded) {
                 playlistInteractor.addPlaylistTrack(playlist.id, track)
-                stateScreenMutableLiveData.postValue(
-                    PlayerScreenState.TrackAddedToPlaylist(playlist, true)
-                )
-            } else {
-                stateScreenMutableLiveData.postValue(
-                    PlayerScreenState.TrackAddedToPlaylist(playlist, false)
-                )
             }
-
+            _trackAddedEvent.emit(Pair(playlist, isAdded))
         }
     }
 

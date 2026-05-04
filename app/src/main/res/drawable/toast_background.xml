@@ -1,9 +1,0 @@
-<inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:insetLeft="8dp"
-    android:insetRight="8dp">
-
-    <shape android:shape="rectangle">
-        <solid android:color="@color/toast_background"/>
-    </shape>
-
-</inset>
