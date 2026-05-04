@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,8 +31,9 @@ fun PlaylistRowItem(
     playlist: Playlist,
     onClick: () -> Unit,
 ) {
-    val model: Any =
+    val model: Any = remember(playlist.imageUri) {
         if (playlist.imageUri.isNotEmpty()) File(playlist.imageUri) else R.drawable.ic_album_placeholder
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
