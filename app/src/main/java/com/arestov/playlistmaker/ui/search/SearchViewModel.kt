@@ -24,6 +24,8 @@ class SearchViewModel(
     private var previousText = ""
     private var searchJob: Job? = null
 
+    val currentQuery: String get() = previousText
+
     fun start() {
         if (previousText.isEmpty()) loadHistory()
     }
@@ -64,6 +66,12 @@ class SearchViewModel(
         viewModelScope.launch {
             trackRepository.setFavorite(tracks)
         }
+    }
+
+    fun retrySearch() {
+        val text = previousText
+        previousText = ""
+        searchTracks(text)
     }
 
     fun searchTracks(searchText: String) {
